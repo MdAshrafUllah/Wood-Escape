@@ -20,7 +20,6 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
     final board = gameState.board;
-
     return AspectRatio(
       aspectRatio: 1,
       child: LayoutBuilder(
@@ -31,7 +30,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
 
           return Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1B0D07),
+              color: AppColors.boardBackground,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -62,9 +61,11 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                         child: Container(
                           margin: const EdgeInsets.all(1.5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF26130B),
+                            color: AppColors.tileSlotColor,
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: const Color(0xFF170A05)),
+                            border: Border.all(
+                              color: AppColors.accentSlotBorder,
+                            ),
                           ),
                         ),
                       );
@@ -103,6 +104,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                 ),
 
                 // 4. Outer Wooden Frame Overlays
+                // Top Frame
                 Positioned(
                   top: 0,
                   left: 0,
@@ -110,13 +112,14 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                   height: widget.borderWidth,
                   child: Container(
                     decoration: const BoxDecoration(
-                      color: Color(0xFF8D5B36),
+                      color: AppColors.frameBorderLight,
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(20),
                       ),
                     ),
                   ),
                 ),
+                // Bottom Frame
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -124,13 +127,14 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                   height: widget.borderWidth,
                   child: Container(
                     decoration: const BoxDecoration(
-                      color: Color(0xFF8D5B36),
+                      color: AppColors.frameBorderLight,
                       borderRadius: BorderRadius.vertical(
                         bottom: Radius.circular(20),
                       ),
                     ),
                   ),
                 ),
+                // Left Frame
                 Positioned(
                   top: 0,
                   bottom: 0,
@@ -138,36 +142,24 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                   width: widget.borderWidth,
                   child: Container(
                     decoration: const BoxDecoration(
-                      color: Color(0xFF7A4D2C),
+                      color: AppColors.frameBorderDark,
                       borderRadius: BorderRadius.horizontal(
                         left: Radius.circular(20),
                       ),
                     ),
                   ),
                 ),
+                // Right Frame
                 Positioned(
                   top: 0,
                   right: 0,
-                  width: widget.borderWidth,
-                  height: widget.borderWidth + (2 * cellSize),
+                  bottom: 0,
                   child: Container(
+                    width: widget.borderWidth,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF7A4D2C),
+                      color: AppColors.frameBorderDark,
                       borderRadius: BorderRadius.only(
                         topRight: Radius.circular(20),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  width: widget.borderWidth,
-                  height: widget.borderWidth + (3 * cellSize),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF7A4D2C),
-                      borderRadius: BorderRadius.only(
                         bottomRight: Radius.circular(20),
                       ),
                     ),
@@ -184,7 +176,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                   child: const Center(
                     child: Icon(
                       Icons.keyboard_double_arrow_right_rounded,
-                      color: Color(0xFFFFB300),
+                      color: AppColors.accentGold,
                       size: 16,
                     ),
                   ),
@@ -239,18 +231,14 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
           padding: const EdgeInsets.all(2.5),
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: block.isTarget
-                    ? [const Color(0xFFFF5252), const Color(0xFFB71C1C)]
-                    : [const Color(0xFFD38E53), const Color(0xFF8B5129)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              gradient: block.isTarget
+                  ? AppColors.targetBlockGradient
+                  : AppColors.standardBlockGradient,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: block.isTarget
-                    ? const Color(0xFFFF8A80)
-                    : const Color(0xFFF5C999).withValues(alpha: 0.9),
+                    ? AppColors.accentSoftRed
+                    : AppColors.withAlpha(AppColors.accentLightPeach, 0.9),
                 width: 1.5,
               ),
               boxShadow: [
@@ -269,7 +257,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: AppColors.white.withValues(alpha: 0.15),
+                        color: AppColors.withAlpha(AppColors.white, 0.15),
                         width: 1,
                       ),
                     ),
@@ -280,7 +268,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                     width: isHorizontal ? (block.length * cellSize * 0.45) : 3,
                     height: isHorizontal ? 3 : (block.length * cellSize * 0.45),
                     decoration: BoxDecoration(
-                      color: AppColors.black.withValues(alpha: 0.18),
+                      color: AppColors.withAlpha(AppColors.black, 0.18),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

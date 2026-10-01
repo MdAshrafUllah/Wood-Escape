@@ -173,14 +173,10 @@ class HomeScreen extends ConsumerWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFD38E53), Color(0xFF8B5129)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.standardBlockGradient,
         borderRadius: BorderRadius.circular(size * 0.22),
         border: Border.all(
-          color: const Color(0xFFF5C999).withValues(alpha: 0.8),
+          color: AppColors.accentLightPeach.withValues(alpha: 0.8),
           width: 2.5,
         ),
         boxShadow: [
@@ -195,7 +191,7 @@ class HomeScreen extends ConsumerWidget {
         child: Icon(
           Icons.grid_view_rounded,
           size: iconSize,
-          color: const Color(0xFFFFF3E0),
+          color: AppColors.splashIconColor,
         ),
       ),
     );

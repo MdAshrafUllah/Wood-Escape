@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         context.go(AppRoutes.home);
       }
@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF130A06), // Deep Wooden Background
+      backgroundColor: AppColors.primaryBackground,
       body: Stack(
         children: [
           // Background Gradient Overlay
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
               gradient: RadialGradient(
                 center: Alignment.center,
                 radius: 0.9,
-                colors: [Color(0xFF2C160B), Color(0xFF130A06)],
+                colors: [AppColors.cardSurface, AppColors.primaryBackground],
               ),
             ),
           ),
@@ -82,14 +82,12 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 110,
                       height: 110,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFD38E53), Color(0xFF8B5129)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        gradient: AppColors.standardBlockGradient,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: const Color(0xFFF5C999).withValues(alpha: 0.8),
+                          color: AppColors.accentLightPeach.withValues(
+                            alpha: 0.8,
+                          ),
                           width: 2.5,
                         ),
                         boxShadow: [
@@ -104,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Icon(
                           Icons.grid_view_rounded,
                           size: 56,
-                          color: Color(0xFFFFF3E0),
+                          color: AppColors.splashIconColor,
                         ),
                       ),
                     ),
@@ -117,7 +115,9 @@ class _SplashScreenState extends State<SplashScreen>
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
-                        color: Color(0xFFF5EBE1),
+                        color: Color(
+                          0xFFF5EBE1,
+                        ), // TODO: Add or use existing if matches (e.g. textPrimary or similar?)
                         shadows: [
                           Shadow(
                             color: AppColors.black,
@@ -136,7 +136,9 @@ class _SplashScreenState extends State<SplashScreen>
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 4.0,
-                        color: const Color(0xFFD38E53).withValues(alpha: 0.9),
+                        color: AppColors.woodGradientStart.withValues(
+                          alpha: 0.9,
+                        ),
                       ),
                     ),
                   ],
@@ -158,7 +160,7 @@ class _SplashScreenState extends State<SplashScreen>
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      const Color(0xFFD38E53).withValues(alpha: 0.8),
+                      AppColors.woodGradientStart.withValues(alpha: 0.8),
                     ),
                   ),
                 ),

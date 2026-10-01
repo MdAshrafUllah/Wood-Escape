@@ -28,6 +28,7 @@ class AppColors {
   static const Color accentMutedBrown = Color(0xFF6E5144);
   static const Color accentSlotBorder = Color(0xFF170A05);
   static const Color accentLightPeach = Color(0xFFF5C999);
+  static const Color splashTitleColor = Color(0xFFF5EBE1);
   static const Color accentSoftRed = Color(0xFFFF8A80);
   static const Color accentAmber = Color(0xFFFFC107);
   static const Color accentYellow = Color(0xFFFFFF00);
@@ -44,6 +45,10 @@ class AppColors {
   static const Color accentStandardBlockStart = Color(0xFFD38E53);
   static const Color accentStandardBlockEnd = Color(0xFF8B5129);
 
+  // Specific UI colors
+  static const Color woodGradientStart = Color(0xFFD38E53);
+  static const Color woodGradientEnd = Color(0xFF8B5129);
+  static const Color splashIconColor = Color(0xFFFFF3E0);
   // System Colors
   static const Color black = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
