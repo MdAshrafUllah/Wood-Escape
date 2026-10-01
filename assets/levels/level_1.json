@@ -1,0 +1,23 @@
+{
+  "id": 1,
+  "difficulty": "easy",
+  "targetMoves": 10,
+  "blocks": [
+    {
+      "id": "target",
+      "x": 0,
+      "y": 2,
+      "length": 2,
+      "orientation": "h",
+      "isTarget": true
+    },
+    {
+      "id": "h1",
+      "x": 0,
+      "y": 0,
+      "length": 3,
+      "orientation": "h",
+      "isTarget": false
+    }
+  ]
+}
