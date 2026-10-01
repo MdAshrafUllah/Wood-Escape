@@ -14,7 +14,6 @@ class AppColors {
   // Text & Icons
   static const Color textPrimary = Color(0xFFF3C892);
   static const Color textSecondary = Color(0xFFB38257);
-
   static const Color accentOrange = Color(0xFFFF8C00);
   static const Color accentRed = Color(0xFFD84315);
   static const Color accentGold = Color(0xFFFFB300);
@@ -44,6 +43,10 @@ class AppColors {
   static const Color accentHintGlow = Color(0xFFFFEA00);
   static const Color accentStandardBlockStart = Color(0xFFD38E53);
   static const Color accentStandardBlockEnd = Color(0xFF8B5129);
+
+  // System Colors
+  static const Color black = Color(0xFF000000);
+  static const Color white = Color(0xFFFFFFFF);
 
   // Gradients
   static const LinearGradient accentOrangeGradient = LinearGradient(

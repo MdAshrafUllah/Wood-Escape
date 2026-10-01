@@ -16,7 +16,7 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: AppColors.primaryBackground,
       body: Stack(
         children: [
-          // Background Glow & Pattern Accent
+          // Background Glow Accents
           Positioned(
             top: -100,
             left: -50,
@@ -43,185 +43,124 @@ class HomeScreen extends ConsumerWidget {
           ),
 
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 20.0,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(height: 10),
+            child: OrientationBuilder(
+              builder: (context, orientation) {
+                final isLandscape = orientation == Orientation.landscape;
 
-                  // Game Logo & Title Header
-                  Column(
-                    children: [
-                      // Decorative Icon Badge
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.frameBorderLight,
-                              AppColors.accentDarkBrownGradient,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                if (isLandscape) {
+                  // LANDSCAPE LAYOUT (Perfect Vertically & Horizontally Centered)
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
                           ),
-                          border: Border.all(
-                            color: AppColors.withAlpha(
-                              AppColors.textPrimary,
-                              0.6,
-                            ),
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.withAlpha(Colors.black, 0.5),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.grid_4x4_rounded,
-                          size: 48,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Title Text
-                      Text(
-                        'WOODEN',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 8,
-                          color: AppColors.textSecondary,
-                          shadows: [
-                            Shadow(
-                              color: AppColors.withAlpha(Colors.black, 0.8),
-                              offset: const Offset(0, 2),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        'PUZZLE',
-                        style: TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 4,
-                          color: AppColors.textPrimary,
-                          shadows: [
-                            Shadow(
-                              color: AppColors.withAlpha(Colors.black, 0.9),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      // Subtitle Banner
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.cardSurface,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.withAlpha(
-                              AppColors.accentLightBrownGradient,
-                              0.3,
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32.0,
+                                vertical: 16.0,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Left Side: Logo & Title
+                                  Expanded(
+                                    flex: 5,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        _buildLogo(size: 80, iconSize: 40),
+                                        const SizedBox(height: 12),
+                                        _buildTitleText(
+                                          subtitleSize: 16,
+                                          mainTitleSize: 32,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _buildSubtitleBanner(),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 24),
+                                  // Right Side: Buttons & Progress
+                                  Expanded(
+                                    flex: 6,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        _buildMenuButtons(context, gameState),
+                                        const SizedBox(height: 16),
+                                        _buildProgressFooter(gameState),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        child: Text(
-                          'Unblock The Red Block',
-                          style: TextStyle(
-                            color: AppColors.withAlpha(
-                              AppColors.accentLightBrown,
-                              0.9,
+                      );
+                    },
+                  );
+                }
+
+                // PORTRAIT LAYOUT
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                            vertical: 20.0,
+                          ),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const SizedBox(height: 10),
+                                Column(
+                                  children: [
+                                    _buildLogo(size: 110, iconSize: 56),
+                                    const SizedBox(height: 24),
+                                    _buildTitleText(
+                                      subtitleSize: 22,
+                                      mainTitleSize: 42,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    _buildSubtitleBanner(),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                Column(
+                                  children: [
+                                    _buildMenuButtons(context, gameState),
+                                    const SizedBox(height: 24),
+                                    _buildProgressFooter(gameState),
+                                  ],
+                                ),
+                              ],
                             ),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-
-                  // Menu Action Buttons
-                  Column(
-                    children: [
-                      // Play Resume Button (Primary)
-                      _buildWoodenButton(
-                        context: context,
-                        label: 'PLAY (LEVEL ${gameState.currentLevel})',
-                        icon: Icons.play_arrow_rounded,
-                        isPrimary: true,
-                        onTap: () => context.goNamed(AppRoutes.game),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Select Level Button
-                      _buildWoodenButton(
-                        context: context,
-                        label: 'SELECT LEVEL',
-                        icon: Icons.grid_view_rounded,
-                        isPrimary: false,
-                        onTap: () => context.pushNamed(AppRoutes.level),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Settings Button
-                      _buildWoodenButton(
-                        context: context,
-                        label: 'SETTINGS',
-                        icon: Icons.settings_rounded,
-                        isPrimary: false,
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Settings coming soon!'),
-                              duration: Duration(seconds: 1),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-
-                  // Footer Progress
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        color: AppColors.accentGold,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Unlocked: ${gameState.unlockedLevel} / 100',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -229,7 +168,158 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  // Custom Wooden 3D Action Button Builder
+  Widget _buildLogo({required double size, required double iconSize}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFD38E53), Color(0xFF8B5129)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(size * 0.22),
+        border: Border.all(
+          color: const Color(0xFFF5C999).withValues(alpha: 0.8),
+          width: 2.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withValues(alpha: 0.6),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.grid_view_rounded,
+          size: iconSize,
+          color: const Color(0xFFFFF3E0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitleText({
+    required double subtitleSize,
+    required double mainTitleSize,
+  }) {
+    return Column(
+      children: [
+        Text(
+          'WOODEN',
+          style: TextStyle(
+            fontSize: subtitleSize,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 8,
+            color: AppColors.textSecondary,
+            shadows: [
+              Shadow(
+                color: AppColors.withAlpha(AppColors.black, 0.8),
+                offset: const Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+        ),
+        Text(
+          'ESCAPE',
+          style: TextStyle(
+            fontSize: mainTitleSize,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 4,
+            color: AppColors.textPrimary,
+            shadows: [
+              Shadow(
+                color: AppColors.withAlpha(AppColors.black, 0.9),
+                offset: const Offset(0, 4),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubtitleBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.cardSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.withAlpha(AppColors.accentLightBrownGradient, 0.3),
+        ),
+      ),
+      child: Text(
+        'Unblock The Red Block',
+        style: TextStyle(
+          color: AppColors.withAlpha(AppColors.accentLightBrown, 0.9),
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuButtons(BuildContext context, GameState gameState) {
+    return Column(
+      children: [
+        _buildWoodenButton(
+          context: context,
+          label: 'PLAY (LEVEL ${gameState.currentLevel})',
+          icon: Icons.play_arrow_rounded,
+          isPrimary: true,
+          onTap: () => context.go(AppRoutes.game),
+        ),
+        const SizedBox(height: 10),
+        _buildWoodenButton(
+          context: context,
+          label: 'SELECT LEVEL',
+          icon: Icons.grid_view_rounded,
+          isPrimary: false,
+          onTap: () => context.push(AppRoutes.level),
+        ),
+        const SizedBox(height: 10),
+        _buildWoodenButton(
+          context: context,
+          label: 'SETTINGS',
+          icon: Icons.settings_rounded,
+          isPrimary: false,
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Settings coming soon!'),
+                duration: Duration(seconds: 1),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressFooter(GameState gameState) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.star_rounded, color: AppColors.accentGold, size: 18),
+        const SizedBox(width: 6),
+        Text(
+          'Unlocked: ${gameState.unlockedLevel} / 30,000',
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildWoodenButton({
     required BuildContext context,
     required String label,
@@ -239,7 +329,7 @@ class HomeScreen extends ConsumerWidget {
   }) {
     return Container(
       width: double.infinity,
-      height: 58,
+      height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: isPrimary
@@ -262,7 +352,7 @@ class HomeScreen extends ConsumerWidget {
           BoxShadow(
             color: isPrimary
                 ? AppColors.withAlpha(AppColors.accentRed, 0.4)
-                : AppColors.withAlpha(Colors.black, 0.5),
+                : AppColors.withAlpha(AppColors.black, 0.5),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -280,17 +370,23 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 Icon(
                   icon,
-                  color: isPrimary ? Colors.white : AppColors.textPrimary,
-                  size: 24,
+                  color: isPrimary ? AppColors.white : AppColors.textPrimary,
+                  size: 22,
                 ),
-                const SizedBox(width: 12),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isPrimary ? Colors.white : AppColors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isPrimary
+                          ? AppColors.white
+                          : AppColors.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
                   ),
                 ),
               ],

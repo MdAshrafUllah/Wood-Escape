@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../domain/models/block.dart';
-import '../controllers/game_controller.dart';
+import 'package:woodescape/core/theme/app_colors.dart';
+import 'package:woodescape/domain/models/block.dart';
+import 'package:woodescape/presentation/controllers/game_controller.dart';
 
 class GameBoardWidget extends ConsumerStatefulWidget {
   final double borderWidth;
@@ -35,7 +35,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.7),
+                  color: AppColors.black.withValues(alpha: 0.7),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -217,9 +217,21 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
 
             ref
                 .read(gameProvider.notifier)
-                .moveBlock(block, deltaRow, deltaCol);
+                .slideBlock(block, deltaRow, deltaCol);
             dragAccumulator = 0.0;
           }
+        },
+        onPanEnd: (_) {
+          if (dragAccumulator.abs() >= cellSize * 0.3) {
+            int step = dragAccumulator > 0 ? 1 : -1;
+            int deltaRow = isHorizontal ? 0 : step;
+            int deltaCol = isHorizontal ? step : 0;
+
+            ref
+                .read(gameProvider.notifier)
+                .slideBlock(block, deltaRow, deltaCol);
+          }
+          dragAccumulator = 0.0;
         },
         child: Container(
           width: isHorizontal ? block.length * cellSize : cellSize,
@@ -243,7 +255,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
+                  color: AppColors.black.withValues(alpha: 0.4),
                   blurRadius: 4,
                   offset: const Offset(1, 2),
                 ),
@@ -257,7 +269,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.15),
+                        color: AppColors.white.withValues(alpha: 0.15),
                         width: 1,
                       ),
                     ),
@@ -268,7 +280,7 @@ class _GameBoardWidgetState extends ConsumerState<GameBoardWidget> {
                     width: isHorizontal ? (block.length * cellSize * 0.45) : 3,
                     height: isHorizontal ? 3 : (block.length * cellSize * 0.45),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.18),
+                      color: AppColors.black.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

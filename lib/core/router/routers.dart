@@ -1,5 +1,5 @@
 abstract class PageRoutes {
-  static const String root = '';
+  static const String root = 'root';
   static const String home = 'home';
   static const String level = 'level';
   static const String game = 'game';
