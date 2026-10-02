@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
+import 'package:woodescape/services/audio_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -19,7 +22,7 @@ class SettingsScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Header Bar
+            // ─── Header ───────────────────────────────────────────
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -71,7 +74,7 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // Settings Options
+            // ─── Tiles ────────────────────────────────────────────
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -81,8 +84,14 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'In-game move & completion sounds',
                     icon: Icons.volume_up_rounded,
                     value: settings.sound,
-                    onChanged: (val) =>
-                        notifier.updateSettings(settings.copyWith(sound: val)),
+                    onChanged: (val) async {
+                      final updated = settings.copyWith(sound: val);
+                      await notifier.updateSettings(updated);
+                      await AudioService().applySettings(
+                        sound: updated.sound,
+                        music: updated.music,
+                      );
+                    },
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
@@ -90,8 +99,14 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'Relaxing background wooden audio',
                     icon: Icons.music_note_rounded,
                     value: settings.music,
-                    onChanged: (val) =>
-                        notifier.updateSettings(settings.copyWith(music: val)),
+                    onChanged: (val) async {
+                      final updated = settings.copyWith(music: val);
+                      await notifier.updateSettings(updated);
+                      await AudioService().applySettings(
+                        sound: updated.sound,
+                        music: updated.music,
+                      );
+                    },
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
@@ -99,9 +114,11 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'Micro-taps when sliding blocks',
                     icon: Icons.touch_app_rounded,
                     value: settings.haptics,
-                    onChanged: (val) => notifier.updateSettings(
-                      settings.copyWith(haptics: val),
-                    ),
+                    onChanged: (val) async {
+                      await notifier.updateSettings(
+                        settings.copyWith(haptics: val),
+                      );
+                    },
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
@@ -109,9 +126,11 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'Level completion & event vibration',
                     icon: Icons.vibration_rounded,
                     value: settings.vibration,
-                    onChanged: (val) => notifier.updateSettings(
-                      settings.copyWith(vibration: val),
-                    ),
+                    onChanged: (val) async {
+                      await notifier.updateSettings(
+                        settings.copyWith(vibration: val),
+                      );
+                    },
                   ),
                   const SizedBox(height: 24),
                   _buildActionTile(
@@ -125,6 +144,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
 
+            // ─── Footer ───────────────────────────────────────────
             const Padding(
               padding: EdgeInsets.only(bottom: 16.0),
               child: Text(
@@ -142,6 +162,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  // ─── Toggle tile ─────────────────────────────────────────────
   Widget _buildToggleTile({
     required String title,
     required String subtitle,
@@ -205,6 +226,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  // ─── Action tile (destructive) ───────────────────────────────
   Widget _buildActionTile({
     required String title,
     required String subtitle,
@@ -266,12 +288,54 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  // ─── Reset process ───────────────────────────────────────────
+  Future<void> _handleResetProcess(BuildContext context, WidgetRef ref) async {
+    final auth = LocalAuthentication();
+
+    try {
+      final canCheckBiometrics = await auth.canCheckBiometrics;
+      final canAuthenticate =
+          canCheckBiometrics || await auth.isDeviceSupported();
+
+      bool authenticated = false;
+
+      if (canAuthenticate) {
+        authenticated = await auth.authenticate(
+          localizedReason:
+              'Please verify device PIN/Password to reset game progress',
+          biometricOnly: false,
+        );
+      } else {
+        authenticated = true;
+      }
+
+      if (!authenticated) return;
+
+      await ref.read(progressProvider.notifier).resetAll();
+      ref.read(gameProvider.notifier).selectLevel(1);
+
+      if (!context.mounted) return;
+      context.pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('All progress and settings have been reset.'),
+        ),
+      );
+    } on PlatformException catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Authentication failed or cancelled.')),
+      );
+    }
+  }
+
+  // ─── Confirmation dialog ─────────────────────────────────────
   void _showResetConfirmationDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.transparent,
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -298,7 +362,8 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'This will permanently reset all game progress and settings back to default.',
+                  'This will permanently reset all game progress. '
+                  'Authentication required if device screen lock is set.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.textSecondary,
@@ -318,7 +383,7 @@ class SettingsScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        onPressed: () => context.pop(),
+                        onPressed: () => dialogContext.pop(),
                         child: const Text(
                           'CANCEL',
                           style: TextStyle(color: AppColors.textPrimary),
@@ -334,19 +399,9 @@ class SettingsScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        onPressed: () async {
-                          await ref.read(progressProvider.notifier).resetAll();
-                          ref.read(gameProvider.notifier).selectLevel(1);
-                          if (context.mounted) {
-                            context.pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'All progress and settings reset',
-                                ),
-                              ),
-                            );
-                          }
+                        onPressed: () {
+                          dialogContext.pop();
+                          _handleResetProcess(context, ref);
                         },
                         child: const Text(
                           'RESET',

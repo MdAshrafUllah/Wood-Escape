@@ -19,6 +19,8 @@ dependencies:
   json_annotation: ^4.12.0
   go_router: 14.0.0
   shared_preferences: ^2.5.5
+  local_auth: ^3.0.2
+  audioplayers: ^6.7.1
 
 dev_dependencies:
   flutter_test:
@@ -30,3 +32,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/audio/move.mp3
+    - assets/audio/win.mp3
+    - assets/audio/bg_music.mp3

@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:woodescape/core/constants/app_audio.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
+import 'package:woodescape/services/audio_service.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    AudioService().playBackgroundMusic(AppAudio.bgMusic);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameProvider);
 
     return Scaffold(
       backgroundColor: AppColors.primaryBackground,
       body: Stack(
         children: [
-          // Background Glow Accents
           Positioned(
             top: -100,
             left: -50,
@@ -48,7 +61,6 @@ class HomeScreen extends ConsumerWidget {
                 final isLandscape = orientation == Orientation.landscape;
 
                 if (isLandscape) {
-                  // LANDSCAPE LAYOUT (Perfect Vertically & Horizontally Centered)
                   return LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
@@ -67,7 +79,6 @@ class HomeScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Left Side: Logo & Title
                                   Expanded(
                                     flex: 5,
                                     child: Column(
@@ -88,7 +99,6 @@ class HomeScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 24),
-                                  // Right Side: Buttons & Progress
                                   Expanded(
                                     flex: 6,
                                     child: Column(
@@ -113,7 +123,6 @@ class HomeScreen extends ConsumerWidget {
                   );
                 }
 
-                // PORTRAIT LAYOUT
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(

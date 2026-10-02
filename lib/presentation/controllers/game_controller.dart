@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:woodescape/core/constants/app_audio.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/domain/engine/game_board.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
+import 'package:woodescape/services/audio_service.dart';
 
 class GameState {
   final int currentLevel;
@@ -673,6 +675,7 @@ class GameNotifier extends Notifier<GameState> {
     }
 
     if (maxSteps > 0) {
+      AudioService().playSfx(AppAudio.move);
       final updatedBlocks = state.board.blocks.map((b) {
         if (b.id == block.id) {
           return b.copyWith(
@@ -694,6 +697,7 @@ class GameNotifier extends Notifier<GameState> {
 
       // লেভেল জিতলে সাথে সাথে স্টার সেভ করা
       if (isWon) {
+        AudioService().playSfx(AppAudio.win);
         ref
             .read(progressProvider.notifier)
             .recordStars(state.currentLevel, state.stars);
