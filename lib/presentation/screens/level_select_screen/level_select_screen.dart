@@ -72,7 +72,7 @@ class LevelSelectScreen extends ConsumerWidget {
             color: AppColors.textPrimary,
             size: 20,
           ),
-          onPressed: () => context.go(AppRoutes.home),
+          onPressed: () => context.pop(),
         ),
       ),
       body: SafeArea(
@@ -120,7 +120,7 @@ class LevelSelectScreen extends ConsumerWidget {
                       Text(
                         'Level ${gameState.unlockedLevel} / 30,000 Unlocked',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
@@ -142,7 +142,7 @@ class LevelSelectScreen extends ConsumerWidget {
                     ),
                     child: const Icon(
                       Icons.emoji_events_rounded,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 24,
                     ),
                   ),
@@ -180,30 +180,22 @@ class LevelSelectScreen extends ConsumerWidget {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           gradient: isSelected
-                              ? const LinearGradient(
-                                  colors: [Colors.amber, Colors.deepOrange],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                )
-                              : const LinearGradient(
-                                  colors: [
-                                    AppColors.cardSurface,
-                                    AppColors.accentDarkBrown,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
+                              ? AppColors.selectedTabGradient
+                              : AppColors.unselectedTabGradient,
                           borderRadius: BorderRadius.circular(25),
                           border: Border.all(
                             color: isSelected
-                                ? Colors.amberAccent
-                                : AppColors.withAlpha(Colors.white, 0.1),
+                                ? AppColors.accentAmber
+                                : AppColors.withAlpha(AppColors.white, 0.1),
                             width: isSelected ? 1.5 : 1,
                           ),
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: Colors.amber.withAlpha(120),
+                                    color: AppColors.withAlpha(
+                                      AppColors.accentAmber,
+                                      0.47,
+                                    ),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -213,7 +205,9 @@ class LevelSelectScreen extends ConsumerWidget {
                         child: Text(
                           diff.displayName,
                           style: TextStyle(
-                            color: isSelected ? Colors.black : Colors.white70,
+                            color: isSelected
+                                ? AppColors.black
+                                : AppColors.withAlpha(AppColors.white, 0.7),
                             fontWeight: FontWeight.w900,
                             fontSize: 12,
                             letterSpacing: 1.1,
@@ -259,7 +253,7 @@ class LevelSelectScreen extends ConsumerWidget {
                               '🔒 Level $levelNumber is locked! Complete previous levels first.',
                             ),
                             duration: const Duration(seconds: 1),
-                            backgroundColor: Colors.brown.shade800,
+                            backgroundColor: AppColors.accentDeepBrown,
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
@@ -268,35 +262,27 @@ class LevelSelectScreen extends ConsumerWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: isCurrent
-                            ? const LinearGradient(
-                                colors: [Color(0xFFFFB703), Color(0xFFFB8500)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
+                            ? AppColors.levelCurrentGradient
                             : isUnlocked
-                            ? const LinearGradient(
-                                colors: [Color(0xFF38291D), Color(0xFF241A12)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : const LinearGradient(
-                                colors: [Color(0xFF1A1410), Color(0xFF110D0A)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                            ? AppColors.levelUnlockedGradient
+                            : AppColors.levelLockedGradient,
+
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isCurrent
-                              ? Colors.yellowAccent
+                              ? AppColors.accentYellow
                               : isUnlocked
-                              ? AppColors.accentGold.withAlpha(150)
-                              : Colors.white.withAlpha(15),
+                              ? AppColors.withAlpha(AppColors.accentGold, 0.59)
+                              : AppColors.withAlpha(AppColors.white, 0.06),
                           width: isCurrent ? 2.5 : 1.2,
                         ),
                         boxShadow: isCurrent
                             ? [
                                 BoxShadow(
-                                  color: Colors.amber.withAlpha(150),
+                                  color: AppColors.withAlpha(
+                                    AppColors.accentAmber,
+                                    0.59,
+                                  ),
                                   blurRadius: 12,
                                   spreadRadius: 2,
                                 ),
@@ -304,7 +290,10 @@ class LevelSelectScreen extends ConsumerWidget {
                             : isUnlocked
                             ? [
                                 BoxShadow(
-                                  color: Colors.black.withAlpha(50),
+                                  color: AppColors.withAlpha(
+                                    AppColors.black,
+                                    0.2,
+                                  ),
                                   blurRadius: 4,
                                   offset: const Offset(0, 3),
                                 ),
@@ -319,8 +308,8 @@ class LevelSelectScreen extends ConsumerWidget {
                               '$levelNumber',
                               style: TextStyle(
                                 color: isCurrent
-                                    ? Colors.white
-                                    : Colors.amber.shade100,
+                                    ? AppColors.white
+                                    : AppColors.accentLightOrange,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -334,7 +323,7 @@ class LevelSelectScreen extends ConsumerWidget {
                                   Icons.star_rounded,
                                   size: 11,
                                   color: isCurrent
-                                      ? Colors.white
+                                      ? AppColors.white
                                       : AppColors.accentGold,
                                 ),
                               ),
@@ -342,14 +331,17 @@ class LevelSelectScreen extends ConsumerWidget {
                           ] else ...[
                             Icon(
                               Icons.lock_rounded,
-                              color: Colors.white.withAlpha(40),
+                              color: AppColors.withAlpha(AppColors.white, 0.16),
                               size: 20,
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '$levelNumber',
                               style: TextStyle(
-                                color: Colors.white.withAlpha(40),
+                                color: AppColors.withAlpha(
+                                  AppColors.white,
+                                  0.16,
+                                ),
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),

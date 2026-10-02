@@ -104,13 +104,13 @@ class _GameScreenState extends ConsumerState<GameScreen>
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.transparent,
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF26130B),
+              color: AppColors.tileSlotColor,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFFFB300), width: 2),
+              border: Border.all(color: AppColors.accentGold, width: 2),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.black.withValues(alpha: 0.8),
@@ -132,8 +132,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         Icons.star_rounded,
                         size: index == 1 ? 52 : 42,
                         color: isEarned
-                            ? const Color(0xFFFFB300)
-                            : const Color(0xFF4A2E1B),
+                            ? AppColors.accentGold
+                            : AppColors.starEmpty,
                       ),
                     );
                   }),
@@ -145,7 +145,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: Color(0xFFF5EBE1),
+                    color: AppColors.splashTitleColor,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -154,7 +154,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFFB300),
+                    color: AppColors.accentGold,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -162,7 +162,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   'Best possible: $minMoves moves',
                   style: TextStyle(
                     fontSize: 12,
-                    color: const Color(0xFFF5EBE1).withValues(alpha: 0.6),
+                    color: AppColors.withAlpha(AppColors.splashTitleColor, 0.6),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -173,7 +173,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           side: const BorderSide(
-                            color: Color(0xFF8D5B36),
+                            color: AppColors.frameBorderLight,
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(
@@ -188,7 +188,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         child: const Text(
                           'PLAY AGAIN',
                           style: TextStyle(
-                            color: Color(0xFFF5EBE1),
+                            color: AppColors.splashTitleColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -198,7 +198,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF8C00),
+                          backgroundColor: AppColors.accentOrange,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           elevation: 5,
                           shape: RoundedRectangleBorder(
@@ -342,7 +342,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               color: AppColors.textPrimary,
               size: 22,
             ),
-            onPressed: () => context.go(AppRoutes.level),
+            onPressed: () => context.pop(),
           ),
           IconButton(
             constraints: const BoxConstraints(),
@@ -352,7 +352,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               color: AppColors.textPrimary,
               size: 22,
             ),
-            onPressed: () => context.go(AppRoutes.level),
+            onPressed: () => context.push(AppRoutes.level),
           ),
 
           Expanded(
@@ -364,10 +364,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2C160B),
+                  color: AppColors.cardSurface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF8D5B36).withValues(alpha: 0.5),
+                    color: AppColors.withAlpha(AppColors.frameBorderLight, 0.5),
                   ),
                 ),
                 child: Row(
@@ -376,7 +376,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     Text(
                       'LEVEL ${gameState.currentLevel}',
                       style: const TextStyle(
-                        color: Color(0xFFF5EBE1),
+                        color: AppColors.splashTitleColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -388,29 +388,33 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFB300).withValues(alpha: 0.2),
+                        color: AppColors.withAlpha(AppColors.accentGold, 0.2),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: const Color(0xFFFFB300),
+                          color: AppColors.accentGold,
                           width: 0.8,
                         ),
                       ),
                       child: Text(
                         gameState.difficulty.displayName,
                         style: const TextStyle(
-                          color: Color(0xFFFFB300),
+                          color: AppColors.accentGold,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Container(width: 1, height: 12, color: Colors.white24),
+                    Container(
+                      width: 1,
+                      height: 12,
+                      color: AppColors.withAlpha(AppColors.white, 24),
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'MOVES: ${gameState.moveCount}',
                       style: const TextStyle(
-                        color: Color(0xFFFFB300),
+                        color: AppColors.accentGold,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -840,18 +844,18 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFB300),
+                      color: AppColors.accentGold,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.5),
+                          color: AppColors.black.withValues(alpha: 0.5),
                           blurRadius: 6,
                         ),
                       ],
                     ),
                     child: Icon(
                       arrowIcon,
-                      color: const Color(0xFF26130B),
+                      color: AppColors.tileSlotColor,
                       size: 20,
                     ),
                   ),

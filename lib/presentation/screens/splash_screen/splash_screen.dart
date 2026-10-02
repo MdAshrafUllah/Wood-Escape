@@ -115,9 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
-                        color: Color(
-                          0xFFF5EBE1,
-                        ), // TODO: Add or use existing if matches (e.g. textPrimary or similar?)
+                        color: AppColors.splashTitleColor,
                         shadows: [
                           Shadow(
                             color: AppColors.black,

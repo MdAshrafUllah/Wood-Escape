@@ -49,9 +49,48 @@ class AppColors {
   static const Color woodGradientStart = Color(0xFFD38E53);
   static const Color woodGradientEnd = Color(0xFF8B5129);
   static const Color splashIconColor = Color(0xFFFFF3E0);
+
   // System Colors
   static const Color black = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
+  static const Color transparent = Colors.transparent;
+
+  // Level select / dialog specifics
+  static const Color starEmpty = Color(0xFF4A2E1B);
+  static const Color levelUnlockedGradientStart = Color(0xFF38291D);
+  static const Color levelUnlockedGradientEnd = Color(0xFF241A12);
+  static const Color levelCurrentGradientStart = Color(0xFFFFB703);
+  static const Color levelCurrentGradientEnd = Color(0xFFFB8500);
+
+  static const LinearGradient levelCurrentGradient = LinearGradient(
+    colors: [levelCurrentGradientStart, levelCurrentGradientEnd],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient levelUnlockedGradient = LinearGradient(
+    colors: [levelUnlockedGradientStart, levelUnlockedGradientEnd],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient levelLockedGradient = LinearGradient(
+    colors: [accentLockedLevelGradientStart, accentLockedLevelGradientEnd],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient selectedTabGradient = LinearGradient(
+    colors: [accentAmber, accentRed],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient unselectedTabGradient = LinearGradient(
+    colors: [cardSurface, accentDarkBrown],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   // Gradients
   static const LinearGradient accentOrangeGradient = LinearGradient(

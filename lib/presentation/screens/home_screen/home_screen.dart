@@ -269,7 +269,7 @@ class HomeScreen extends ConsumerWidget {
           label: 'PLAY (LEVEL ${gameState.currentLevel})',
           icon: Icons.play_arrow_rounded,
           isPrimary: true,
-          onTap: () => context.go(AppRoutes.game),
+          onTap: () => context.push(AppRoutes.game),
         ),
         const SizedBox(height: 10),
         _buildWoodenButton(
@@ -355,7 +355,7 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onTap,
