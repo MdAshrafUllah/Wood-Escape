@@ -285,14 +285,7 @@ class HomeScreen extends ConsumerWidget {
           label: 'SETTINGS',
           icon: Icons.settings_rounded,
           isPrimary: false,
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Settings coming soon!'),
-                duration: Duration(seconds: 1),
-              ),
-            );
-          },
+          onTap: () => context.push(AppRoutes.settings),
         ),
       ],
     );

@@ -338,7 +338,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             constraints: const BoxConstraints(),
             padding: const EdgeInsets.all(8),
             icon: const Icon(
-              Icons.arrow_back_ios_new,
+              Icons.arrow_back_ios_new_rounded,
               color: AppColors.textPrimary,
               size: 22,
             ),

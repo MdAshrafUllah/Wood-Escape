@@ -68,7 +68,7 @@ class LevelSelectScreen extends ConsumerWidget {
         ),
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back_ios_new,
+            Icons.arrow_back_ios_new_rounded,
             color: AppColors.textPrimary,
             size: 20,
           ),

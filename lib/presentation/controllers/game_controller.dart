@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/domain/engine/game_board.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
@@ -57,12 +58,12 @@ int calculateStars(int moves, int minMoves) {
 
 class GameNotifier extends Notifier<GameState> {
   static LevelDifficulty getDifficultyForLevel(int level) {
-    if (level <= 5000) return LevelDifficulty.easy; // 1 - 5,000
-    if (level <= 10000) return LevelDifficulty.medium; // 5,001 - 10,000
-    if (level <= 15000) return LevelDifficulty.hard; // 10,001 - 15,000
-    if (level <= 20000) return LevelDifficulty.expert; // 15,001 - 20,000
-    if (level <= 25000) return LevelDifficulty.legend; // 20,001 - 25,000
-    return LevelDifficulty.master; // 25,001 - 30,000
+    if (level <= 5000) return LevelDifficulty.easy;
+    if (level <= 10000) return LevelDifficulty.medium;
+    if (level <= 15000) return LevelDifficulty.hard;
+    if (level <= 20000) return LevelDifficulty.expert;
+    if (level <= 25000) return LevelDifficulty.legend;
+    return LevelDifficulty.master;
   }
 
   static List<Block> generateLevel(int level) {
@@ -84,7 +85,7 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
-  // --- EASY LAYOUTS (Level 1 - 20): Fast progression, open paths ---
+  // --- EASY LAYOUTS (Level 1 - 20) ---
   static List<Block> _generateEasyLevel(int level) {
     int variant = (level - 1) % 5;
     if (variant == 0) {
@@ -225,7 +226,7 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
-  // --- MEDIUM LAYOUTS (Level 21 - 50): Moderate congestion ---
+  // --- MEDIUM LAYOUTS ---
   static List<Block> _generateMediumLevel(int level) {
     int variant = (level - 21) % 4;
     if (variant == 0) {
@@ -403,7 +404,7 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
-  // --- HARD LAYOUTS (Level 51 - 100): Highly congested traps ---
+  // --- HARD LAYOUTS ---
   static List<Block> _generateHardLevel(int level) {
     int variant = (level - 51) % 3;
     if (variant == 0) {
@@ -594,19 +595,12 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
-  // --- EXPERT LAYOUTS (Level 101 - 200) ---
-  static List<Block> _generateExpertLevel(int level) {
-    return _generateHardLevel(level);
-  }
-
-  // --- LEGEND LAYOUTS (Level 201+) ---
-  static List<Block> _generateLegendLevel(int level) {
-    return _generateHardLevel(level);
-  }
-
-  static List<Block> _generateMasterLevel(int level) {
-    return _generateHardLevel(level);
-  }
+  static List<Block> _generateExpertLevel(int level) =>
+      _generateHardLevel(level);
+  static List<Block> _generateLegendLevel(int level) =>
+      _generateHardLevel(level);
+  static List<Block> _generateMasterLevel(int level) =>
+      _generateHardLevel(level);
 
   static int getMinMovesForLevel(int level) {
     final diff = getDifficultyForLevel(level);
@@ -628,27 +622,37 @@ class GameNotifier extends Notifier<GameState> {
 
   @override
   GameState build() {
+    // 1. Storage থেকে আগের সেভ করা ডেটা লোড
+    final savedProgress = ref.read(progressProvider);
+    final level = savedProgress.currentLevel;
+
     return GameState(
-      currentLevel: 1,
-      unlockedLevel: 1,
-      board: GameBoard(blocks: generateLevel(1)),
-      difficulty: getDifficultyForLevel(1),
+      currentLevel: level,
+      unlockedLevel: savedProgress.unlockedLevel,
+      board: GameBoard(blocks: generateLevel(level)),
+      difficulty: getDifficultyForLevel(level),
       moveCount: 0,
-      minMoves: getMinMovesForLevel(1),
+      minMoves: getMinMovesForLevel(level),
       isCompleted: false,
     );
   }
 
   void selectLevel(int level) {
-    if (level <= state.unlockedLevel) {
+    final currentUnlocked = ref.read(progressProvider).unlockedLevel;
+
+    if (level <= currentUnlocked) {
       state = state.copyWith(
         currentLevel: level,
+        unlockedLevel: currentUnlocked,
         board: GameBoard(blocks: generateLevel(level)),
         difficulty: getDifficultyForLevel(level),
         moveCount: 0,
         minMoves: getMinMovesForLevel(level),
         isCompleted: false,
       );
+
+      // Current level পারসিস্টেন্সের জন্য সেভ করা
+      ref.read(progressProvider.notifier).setCurrentLevel(level);
     }
   }
 
@@ -687,24 +691,37 @@ class GameNotifier extends Notifier<GameState> {
         moveCount: state.moveCount + 1,
         isCompleted: isWon,
       );
+
+      // লেভেল জিতলে সাথে সাথে স্টার সেভ করা
+      if (isWon) {
+        ref
+            .read(progressProvider.notifier)
+            .recordStars(state.currentLevel, state.stars);
+      }
     }
   }
 
   void loadNextLevel() {
-    int nextLevel = state.currentLevel + 1;
-    int newUnlockedLevel = nextLevel > state.unlockedLevel
+    final completedLevel = state.currentLevel;
+    final nextLevel = completedLevel + 1;
+
+    final updatedUnlocked = nextLevel > state.unlockedLevel
         ? nextLevel
         : state.unlockedLevel;
 
     state = GameState(
       currentLevel: nextLevel,
-      unlockedLevel: newUnlockedLevel,
+      unlockedLevel: updatedUnlocked,
       board: GameBoard(blocks: generateLevel(nextLevel)),
       difficulty: getDifficultyForLevel(nextLevel),
       moveCount: 0,
       minMoves: getMinMovesForLevel(nextLevel),
       isCompleted: false,
     );
+
+    // 2. সেভ লেভেল স্টেট
+    ref.read(progressProvider.notifier).setUnlockedLevel(updatedUnlocked);
+    ref.read(progressProvider.notifier).setCurrentLevel(nextLevel);
   }
 
   void nextLevel() {
@@ -720,6 +737,6 @@ class GameNotifier extends Notifier<GameState> {
   }
 }
 
-final gameProvider = NotifierProvider<GameNotifier, GameState>(() {
-  return GameNotifier();
-});
+final gameProvider = NotifierProvider<GameNotifier, GameState>(
+  GameNotifier.new,
+);

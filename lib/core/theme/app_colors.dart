@@ -62,6 +62,10 @@ class AppColors {
   static const Color levelCurrentGradientStart = Color(0xFFFFB703);
   static const Color levelCurrentGradientEnd = Color(0xFFFB8500);
 
+  // Added for Settings Screen
+  static const Color dialogBackground = Color(0xFF26130B);
+  static const Color switchTrack = Color(0xFF3E2012);
+
   static const LinearGradient levelCurrentGradient = LinearGradient(
     colors: [levelCurrentGradientStart, levelCurrentGradientEnd],
     begin: Alignment.topLeft,

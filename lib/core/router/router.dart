@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:woodescape/presentation/screens/game_screen/game_screen.dart';
 import 'package:woodescape/presentation/screens/home_screen/home_screen.dart';
 import 'package:woodescape/presentation/screens/level_select_screen/level_select_screen.dart';
+import 'package:woodescape/presentation/screens/settings_screen/settings_screen.dart';
 import 'package:woodescape/presentation/screens/splash_screen/splash_screen.dart';
 
 import 'routers.dart';
@@ -35,6 +36,11 @@ final GoRouter appRouter = GoRouter(
       name: PageRoutes.game,
       path: AppRoutes.game,
       builder: (context, state) => const GameScreen(),
+    ),
+    GoRoute(
+      name: PageRoutes.settings,
+      path: AppRoutes.settings,
+      builder: (context, state) => const SettingsScreen(),
     ),
   ],
   errorBuilder: (context, state) =>
