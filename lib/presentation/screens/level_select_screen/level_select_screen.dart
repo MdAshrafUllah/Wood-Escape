@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
+import 'package:woodescape/core/utils/app_snackbar.dart';
 import 'package:woodescape/domain/models/level_data.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/haptic_service.dart';
@@ -250,15 +251,8 @@ class LevelSelectScreen extends ConsumerWidget {
                         context.push(AppRoutes.game);
                       } else {
                         HapticService().mediumImpact();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '🔒 Level $levelNumber is locked! Complete previous levels first.',
-                            ),
-                            duration: const Duration(seconds: 1),
-                            backgroundColor: AppColors.accentDeepBrown,
-                            behavior: SnackBarBehavior.floating,
-                          ),
+                        AppSnackbar(context).locked(
+                          'Level $levelNumber is locked! Complete previous levels first.',
                         );
                       }
                     },

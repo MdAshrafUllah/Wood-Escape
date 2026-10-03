@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
+import 'package:woodescape/core/utils/app_dialog.dart';
 import 'package:woodescape/domain/engine/puzzle_solver.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
@@ -456,28 +457,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   nextMove.deltaCol,
                 );
               } else {
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    backgroundColor: AppColors.cardSurface,
-                    title: const Text(
-                      'No Solution',
-                      style: TextStyle(color: AppColors.textPrimary),
-                    ),
-                    content: Text(
-                      'No solution found for current layout.',
-                      style: TextStyle(color: AppColors.white.withAlpha(70)),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => context.pop(),
-                        child: const Text(
-                          'OK',
-                          style: TextStyle(color: AppColors.accentOrange),
-                        ),
-                      ),
-                    ],
-                  ),
+                AppDialog(context).info(
+                  title: 'No Solution',
+                  message: 'No solution found for the current layout.',
                 );
               }
             },

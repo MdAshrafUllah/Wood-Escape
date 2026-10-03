@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
+import 'package:woodescape/core/utils/app_dialog.dart';
+import 'package:woodescape/core/utils/app_snackbar.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/audio_service.dart';
@@ -335,108 +337,27 @@ class SettingsScreen extends ConsumerWidget {
 
       if (!context.mounted) return;
       context.pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('All progress and settings have been reset.'),
-        ),
-      );
+      AppSnackbar(
+        context,
+      ).success('All progress and settings have been reset.');
     } on PlatformException catch (_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Authentication failed or cancelled.')),
-      );
+      AppSnackbar(context).error('Authentication failed or cancelled.');
     }
   }
 
   void _showResetConfirmationDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return Dialog(
-          backgroundColor: AppColors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AppColors.cardSurface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.accentRed, width: 1.5),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.warning_amber_rounded,
-                  color: AppColors.accentRed,
-                  size: 48,
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'RESET PROGRESS?',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'This will permanently reset all game progress. '
-                  'Authentication required if device screen lock is set.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            color: AppColors.frameBorderLight,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () => dialogContext.pop(),
-                        child: const Text(
-                          'CANCEL',
-                          style: TextStyle(color: AppColors.textPrimary),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.accentRed,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          dialogContext.pop();
-                          _handleResetProcess(context, ref);
-                        },
-                        child: const Text(
-                          'RESET',
-                          style: TextStyle(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+    AppDialog(context).confirm(
+      title: 'RESET PROGRESS?',
+      message:
+          'This will permanently reset all game progress. '
+          'Authentication required if device screen lock is set.',
+      icon: Icons.warning_amber_rounded,
+      iconColor: AppColors.accentRed,
+      confirmColor: AppColors.accentRed,
+      confirmText: 'RESET',
+      cancelText: 'CANCEL',
+      onConfirm: () => _handleResetProcess(context, ref),
     );
   }
 }
