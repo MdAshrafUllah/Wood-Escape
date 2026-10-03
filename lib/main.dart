@@ -6,6 +6,7 @@ import 'package:woodescape/data/local/storage_service.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/data/local/user_progress_repository.dart';
 import 'package:woodescape/services/audio_service.dart';
+import 'package:woodescape/services/haptic_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,11 @@ void main() async {
   await AudioService().applySettings(
     sound: progress.settings.sound,
     music: progress.settings.music,
+  );
+
+  HapticService().applySettings(
+    haptics: progress.settings.haptics,
+    vibration: progress.settings.vibration,
   );
 
   runApp(

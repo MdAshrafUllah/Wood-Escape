@@ -7,12 +7,19 @@ import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/audio_service.dart';
+import 'package:woodescape/services/haptic_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(progressProvider, (previous, next) {
+      HapticService().applySettings(
+        haptics: next.settings.haptics,
+        vibration: next.settings.vibration,
+      );
+    });
     final progress = ref.watch(progressProvider);
     final settings = progress.settings;
     final notifier = ref.read(progressProvider.notifier);
@@ -22,7 +29,6 @@ class SettingsScreen extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // ─── Header ───────────────────────────────────────────
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -74,7 +80,6 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // ─── Tiles ────────────────────────────────────────────
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -85,6 +90,7 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.volume_up_rounded,
                     value: settings.sound,
                     onChanged: (val) async {
+                      HapticService().mediumImpact();
                       final updated = settings.copyWith(sound: val);
                       await notifier.updateSettings(updated);
                       await AudioService().applySettings(
@@ -100,6 +106,7 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.music_note_rounded,
                     value: settings.music,
                     onChanged: (val) async {
+                      HapticService().mediumImpact();
                       final updated = settings.copyWith(music: val);
                       await notifier.updateSettings(updated);
                       await AudioService().applySettings(
@@ -115,21 +122,37 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.touch_app_rounded,
                     value: settings.haptics,
                     onChanged: (val) async {
-                      await notifier.updateSettings(
-                        settings.copyWith(haptics: val),
+                      final updated = settings.copyWith(haptics: val);
+                      await notifier.updateSettings(updated);
+
+                      HapticService().applySettings(
+                        haptics: updated.haptics,
+                        vibration: updated.vibration,
                       );
+
+                      if (val) {
+                        HapticService().lightImpact();
+                      }
                     },
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
                     title: 'Vibration',
-                    subtitle: 'Level completion & event vibration',
+                    subtitle: 'Vibrate on level completion',
                     icon: Icons.vibration_rounded,
                     value: settings.vibration,
                     onChanged: (val) async {
-                      await notifier.updateSettings(
-                        settings.copyWith(vibration: val),
+                      final updated = settings.copyWith(vibration: val);
+                      await notifier.updateSettings(updated);
+
+                      HapticService().applySettings(
+                        haptics: updated.haptics,
+                        vibration: updated.vibration,
                       );
+
+                      if (val) {
+                        HapticService().winVibration();
+                      }
                     },
                   ),
                   const SizedBox(height: 24),
@@ -144,7 +167,6 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
 
-            // ─── Footer ───────────────────────────────────────────
             const Padding(
               padding: EdgeInsets.only(bottom: 16.0),
               child: Text(
@@ -162,7 +184,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // ─── Toggle tile ─────────────────────────────────────────────
   Widget _buildToggleTile({
     required String title,
     required String subtitle,
@@ -226,7 +247,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // ─── Action tile (destructive) ───────────────────────────────
   Widget _buildActionTile({
     required String title,
     required String subtitle,
@@ -288,7 +308,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // ─── Reset process ───────────────────────────────────────────
   Future<void> _handleResetProcess(BuildContext context, WidgetRef ref) async {
     final auth = LocalAuthentication();
 
@@ -329,7 +348,6 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  // ─── Confirmation dialog ─────────────────────────────────────
   void _showResetConfirmationDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,

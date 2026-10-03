@@ -5,6 +5,7 @@ import 'package:woodescape/domain/engine/game_board.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
 import 'package:woodescape/services/audio_service.dart';
+import 'package:woodescape/services/haptic_service.dart';
 
 class GameState {
   final int currentLevel;
@@ -676,6 +677,7 @@ class GameNotifier extends Notifier<GameState> {
 
     if (maxSteps > 0) {
       AudioService().playSfx(AppAudio.move);
+      HapticService().lightImpact();
       final updatedBlocks = state.board.blocks.map((b) {
         if (b.id == block.id) {
           return b.copyWith(
@@ -698,6 +700,7 @@ class GameNotifier extends Notifier<GameState> {
       // লেভেল জিতলে সাথে সাথে স্টার সেভ করা
       if (isWon) {
         AudioService().playSfx(AppAudio.win);
+        HapticService().winVibration();
         ref
             .read(progressProvider.notifier)
             .recordStars(state.currentLevel, state.stars);

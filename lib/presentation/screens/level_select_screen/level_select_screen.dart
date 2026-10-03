@@ -6,6 +6,7 @@ import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/domain/models/level_data.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
+import 'package:woodescape/services/haptic_service.dart';
 
 final selectedTabProvider = StateProvider<LevelDifficulty>(
   (ref) => LevelDifficulty.easy,
@@ -242,11 +243,13 @@ class LevelSelectScreen extends ConsumerWidget {
                   return GestureDetector(
                     onTap: () {
                       if (isUnlocked) {
+                        HapticService().mediumImpact();
                         ref
                             .read(gameProvider.notifier)
                             .selectLevel(levelNumber);
-                        context.go(AppRoutes.game);
+                        context.push(AppRoutes.game);
                       } else {
+                        HapticService().mediumImpact();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
