@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
@@ -109,9 +110,9 @@ class _SplashScreenState extends State<SplashScreen>
                     const SizedBox(height: 28),
 
                     // Game Title
-                    const Text(
-                      'WoodEscape',
-                      style: TextStyle(
+                    Text(
+                      'app_title'.tr(),
+                      style: const TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
@@ -129,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                     // Subtitle
                     Text(
-                      'UNBLOCK THE WAY',
+                      'splash.subtitle'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

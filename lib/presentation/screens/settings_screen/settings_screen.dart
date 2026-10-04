@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,9 +64,9 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     onPressed: () => context.pop(),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'SETTINGS',
+                      'settings.title'.tr(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppColors.textPrimary,
@@ -87,8 +88,8 @@ class SettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   _buildToggleTile(
-                    title: 'Sound Effects',
-                    subtitle: 'In-game move & completion sounds',
+                    title: 'settings.sound'.tr(),
+                    subtitle: 'settings.sound_sub'.tr(),
                     icon: Icons.volume_up_rounded,
                     value: settings.sound,
                     onChanged: (val) async {
@@ -102,9 +103,19 @@ class SettingsScreen extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(height: 12),
+                  _buildActionTile(
+                    title: 'settings.language'.tr(),
+                    subtitle: context.locale.languageCode == 'bn'
+                        ? 'বাংলা'
+                        : 'English',
+                    icon: Icons.language_rounded,
+                    iconColor: AppColors.accentGold,
+                    onTap: () => _showLanguagePicker(context),
+                  ),
+                  const SizedBox(height: 12),
                   _buildToggleTile(
-                    title: 'Background Music',
-                    subtitle: 'Relaxing background wooden audio',
+                    title: 'settings.music'.tr(),
+                    subtitle: 'settings.music_sub'.tr(),
                     icon: Icons.music_note_rounded,
                     value: settings.music,
                     onChanged: (val) async {
@@ -119,8 +130,8 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
-                    title: 'Haptic Feedback',
-                    subtitle: 'Micro-taps when sliding blocks',
+                    title: 'settings.haptics'.tr(),
+                    subtitle: 'settings.haptics_sub'.tr(),
                     icon: Icons.touch_app_rounded,
                     value: settings.haptics,
                     onChanged: (val) async {
@@ -139,8 +150,8 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
-                    title: 'Vibration',
-                    subtitle: 'Vibrate on level completion',
+                    title: 'settings.vibration'.tr(),
+                    subtitle: 'settings.vibration_sub'.tr(),
                     icon: Icons.vibration_rounded,
                     value: settings.vibration,
                     onChanged: (val) async {
@@ -159,8 +170,8 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
                   _buildActionTile(
-                    title: 'Reset Progress',
-                    subtitle: 'Clear all unlocked levels and stars',
+                    title: 'settings.reset'.tr(),
+                    subtitle: 'settings.reset_sub'.tr(),
                     icon: Icons.restore_rounded,
                     iconColor: AppColors.accentRed,
                     onTap: () => _showResetConfirmationDialog(context, ref),
@@ -169,10 +180,10 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
 
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(bottom: 16.0),
               child: Text(
-                'WoodEscape v1.0.0',
+                'settings.version'.tr(),
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,
@@ -322,8 +333,7 @@ class SettingsScreen extends ConsumerWidget {
 
       if (canAuthenticate) {
         authenticated = await auth.authenticate(
-          localizedReason:
-              'Please verify device PIN/Password to reset game progress',
+          localizedReason: 'settings.auth_reason'.tr(),
           biometricOnly: false,
         );
       } else {
@@ -337,27 +347,59 @@ class SettingsScreen extends ConsumerWidget {
 
       if (!context.mounted) return;
       context.pop();
-      AppSnackbar(
-        context,
-      ).success('All progress and settings have been reset.');
+      AppSnackbar(context).success('settings.reset_done'.tr());
     } on PlatformException catch (_) {
       if (!context.mounted) return;
-      AppSnackbar(context).error('Authentication failed or cancelled.');
+      AppSnackbar(context).error('settings.auth_failed'.tr());
     }
   }
 
   void _showResetConfirmationDialog(BuildContext context, WidgetRef ref) {
     AppDialog(context).confirm(
-      title: 'RESET PROGRESS?',
-      message:
-          'This will permanently reset all game progress. '
-          'Authentication required if device screen lock is set.',
+      title: 'settings.reset_confirm_title'.tr(),
+      message: 'settings.reset_confirm_msg'.tr(),
       icon: Icons.warning_amber_rounded,
       iconColor: AppColors.accentRed,
       confirmColor: AppColors.accentRed,
-      confirmText: 'RESET',
-      cancelText: 'CANCEL',
+      confirmText: 'settings.confirm_reset'.tr(),
+      cancelText: 'settings.cancel'.tr(),
       onConfirm: () => _handleResetProcess(context, ref),
     );
   }
+}
+
+void _showLanguagePicker(BuildContext context) {
+  AppDialog(context).custom(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          title: const Text(
+            'English',
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
+          trailing: context.locale.languageCode == 'en'
+              ? const Icon(Icons.check, color: AppColors.accentGold)
+              : null,
+          onTap: () {
+            context.setLocale(const Locale('en'));
+            Navigator.pop(context);
+          },
+        ),
+        ListTile(
+          title: const Text(
+            'বাংলা',
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
+          trailing: context.locale.languageCode == 'bn'
+              ? const Icon(Icons.check, color: AppColors.accentGold)
+              : null,
+          onTap: () {
+            context.setLocale(const Locale('bn'));
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    ),
+  );
 }

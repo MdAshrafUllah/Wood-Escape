@@ -60,6 +60,10 @@ int calculateStars(int moves, int minMoves) {
 }
 
 class GameNotifier extends Notifier<GameState> {
+  final List<GameBoard> _history = [];
+
+  bool get hasHistory => _history.isNotEmpty;
+
   static LevelDifficulty getDifficultyForLevel(int level) {
     if (level <= 5000) return LevelDifficulty.easy;
     if (level <= 10000) return LevelDifficulty.medium;
@@ -629,6 +633,8 @@ class GameNotifier extends Notifier<GameState> {
     final savedProgress = ref.read(progressProvider);
     final level = savedProgress.currentLevel;
 
+    _history.clear();
+
     return GameState(
       currentLevel: level,
       unlockedLevel: savedProgress.unlockedLevel,
@@ -644,6 +650,7 @@ class GameNotifier extends Notifier<GameState> {
     final currentUnlocked = ref.read(progressProvider).unlockedLevel;
 
     if (level <= currentUnlocked) {
+      _history.clear();
       state = state.copyWith(
         currentLevel: level,
         unlockedLevel: currentUnlocked,
@@ -678,6 +685,9 @@ class GameNotifier extends Notifier<GameState> {
     if (maxSteps > 0) {
       AudioService().playSfx(AppAudio.move);
       HapticService().lightImpact();
+
+      _history.add(state.board);
+
       final updatedBlocks = state.board.blocks.map((b) {
         if (b.id == block.id) {
           return b.copyWith(
@@ -708,6 +718,21 @@ class GameNotifier extends Notifier<GameState> {
     }
   }
 
+  void undo() {
+    if (_history.isEmpty) return;
+
+    final previousBoard = _history.removeLast();
+
+    state = state.copyWith(
+      board: previousBoard,
+      moveCount: state.moveCount > 0 ? state.moveCount - 1 : 0,
+      isCompleted: false,
+    );
+
+    AudioService().playSfx(AppAudio.move);
+    HapticService().lightImpact();
+  }
+
   void loadNextLevel() {
     final completedLevel = state.currentLevel;
     final nextLevel = completedLevel + 1;
@@ -715,6 +740,8 @@ class GameNotifier extends Notifier<GameState> {
     final updatedUnlocked = nextLevel > state.unlockedLevel
         ? nextLevel
         : state.unlockedLevel;
+
+    _history.clear();
 
     state = GameState(
       currentLevel: nextLevel,
@@ -736,6 +763,7 @@ class GameNotifier extends Notifier<GameState> {
   }
 
   void resetLevel() {
+    _history.clear();
     state = state.copyWith(
       board: GameBoard(blocks: generateLevel(state.currentLevel)),
       moveCount: 0,

@@ -22,6 +22,7 @@ dependencies:
   local_auth: ^3.0.2
   audioplayers: ^6.7.1
   vibration: ^3.2.1
+  easy_localization: ^3.0.8
 
 dev_dependencies:
   flutter_test:
@@ -37,3 +38,4 @@ flutter:
     - assets/audio/move.mp3
     - assets/audio/win.mp3
     - assets/audio/bg_music.mp3
+    - assets/translations/

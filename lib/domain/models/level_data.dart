@@ -1,20 +1,20 @@
 enum LevelDifficulty { easy, medium, hard, expert, legend, master }
 
 extension LevelDifficultyX on LevelDifficulty {
-  String get displayName {
+  String get translationKey {
     switch (this) {
       case LevelDifficulty.easy:
-        return 'EASY';
+        return 'level_select.easy';
       case LevelDifficulty.medium:
-        return 'MEDIUM';
+        return 'level_select.medium';
       case LevelDifficulty.hard:
-        return 'HARD';
+        return 'level_select.hard';
       case LevelDifficulty.expert:
-        return 'EXPERT';
+        return 'level_select.expert';
       case LevelDifficulty.legend:
-        return 'LEGEND';
+        return 'level_select.legend';
       case LevelDifficulty.master:
-        return 'MASTER';
+        return 'level_select.master';
     }
   }
 }

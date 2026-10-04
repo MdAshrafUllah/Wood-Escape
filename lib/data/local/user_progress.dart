@@ -3,12 +3,14 @@ class SettingsModel {
   final bool music;
   final bool haptics;
   final bool vibration;
+  final String languageCode;
 
   const SettingsModel({
     this.sound = true,
     this.music = true,
     this.haptics = true,
     this.vibration = true,
+    this.languageCode = 'en',
   });
 
   SettingsModel copyWith({
@@ -16,12 +18,14 @@ class SettingsModel {
     bool? music,
     bool? haptics,
     bool? vibration,
+    String? languageCode,
   }) {
     return SettingsModel(
       sound: sound ?? this.sound,
       music: music ?? this.music,
       haptics: haptics ?? this.haptics,
       vibration: vibration ?? this.vibration,
+      languageCode: languageCode ?? this.languageCode,
     );
   }
 
@@ -30,6 +34,7 @@ class SettingsModel {
     'music': music,
     'haptics': haptics,
     'vibration': vibration,
+    'languageCode': languageCode,
   };
 
   factory SettingsModel.fromJson(Map<String, dynamic>? json) {
@@ -39,6 +44,7 @@ class SettingsModel {
       music: json['music'] as bool? ?? true,
       haptics: json['haptics'] as bool? ?? true,
       vibration: json['vibration'] as bool? ?? true,
+      languageCode: json['languageCode'] as String? ?? 'en',
     );
   }
 }

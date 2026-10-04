@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:woodescape/core/router/router.dart';
@@ -10,6 +11,8 @@ import 'package:woodescape/services/haptic_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await EasyLocalization.ensureInitialized();
 
   final storage = await StorageService.init();
   final repo = UserProgressRepository(storage);
@@ -27,9 +30,16 @@ void main() async {
   );
 
   runApp(
-    ProviderScope(
-      overrides: [storageServiceProvider.overrideWithValue(storage)],
-      child: const WoodEscapeApp(),
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('bn')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: Locale(progress.settings.languageCode),
+      saveLocale: true,
+      child: ProviderScope(
+        overrides: [storageServiceProvider.overrideWithValue(storage)],
+        child: const WoodEscapeApp(),
+      ),
     ),
   );
 }
@@ -44,6 +54,9 @@ class WoodEscapeApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       routerConfig: appRouter,
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
     );
   }
 }

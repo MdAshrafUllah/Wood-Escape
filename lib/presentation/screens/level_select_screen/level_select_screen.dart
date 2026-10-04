@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -59,9 +60,9 @@ class LevelSelectScreen extends ConsumerWidget {
         backgroundColor: AppColors.cardSurface,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'SELECT LEVEL',
-          style: TextStyle(
+        title: Text(
+          'level_select.title'.tr(),
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.w900,
@@ -109,8 +110,8 @@ class LevelSelectScreen extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'CAMPAIGN PROGRESS',
+                      Text(
+                        'level_select.campaign'.tr(),
                         style: TextStyle(
                           color: AppColors.accentGold,
                           fontSize: 11,
@@ -120,7 +121,9 @@ class LevelSelectScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Level ${gameState.unlockedLevel} / 30,000 Unlocked',
+                        'level_select.unlocked_count'.tr(
+                          namedArgs: {'level': '${gameState.unlockedLevel}'},
+                        ),
                         style: const TextStyle(
                           color: AppColors.white,
                           fontSize: 15,
@@ -205,7 +208,7 @@ class LevelSelectScreen extends ConsumerWidget {
                               : [],
                         ),
                         child: Text(
-                          diff.displayName,
+                          diff.translationKey.tr(),
                           style: TextStyle(
                             color: isSelected
                                 ? AppColors.black
@@ -252,7 +255,9 @@ class LevelSelectScreen extends ConsumerWidget {
                       } else {
                         HapticService().mediumImpact();
                         AppSnackbar(context).locked(
-                          'Level $levelNumber is locked! Complete previous levels first.',
+                          'level_select.locked_msg'.tr(
+                            namedArgs: {'level': '$levelNumber'},
+                          ),
                         );
                       }
                     },

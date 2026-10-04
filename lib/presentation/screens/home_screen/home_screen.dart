@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -213,7 +214,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Column(
       children: [
         Text(
-          'WOODEN',
+          'WOODEN'.toUpperCase(),
           style: TextStyle(
             fontSize: subtitleSize,
             fontWeight: FontWeight.w800,
@@ -229,7 +230,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         Text(
-          'ESCAPE',
+          'ESCAPE'.toUpperCase(),
           style: TextStyle(
             fontSize: mainTitleSize,
             fontWeight: FontWeight.w800,
@@ -259,7 +260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       child: Text(
-        'Unblock The Red Block',
+        'home.subtitle'.tr(),
         style: TextStyle(
           color: AppColors.withAlpha(AppColors.accentLightBrown, 0.9),
           fontSize: 13,
@@ -275,7 +276,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       children: [
         _buildWoodenButton(
           context: context,
-          label: 'PLAY (LEVEL ${gameState.currentLevel})',
+          label: 'home.play'.tr(
+            namedArgs: {'level': '${gameState.currentLevel}'},
+          ),
           icon: Icons.play_arrow_rounded,
           isPrimary: true,
           onTap: () => context.push(AppRoutes.game),
@@ -283,7 +286,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         _buildWoodenButton(
           context: context,
-          label: 'SELECT LEVEL',
+          label: 'home.select_level'.tr(),
           icon: Icons.grid_view_rounded,
           isPrimary: false,
           onTap: () => context.push(AppRoutes.level),
@@ -291,7 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         _buildWoodenButton(
           context: context,
-          label: 'SETTINGS',
+          label: 'home.settings'.tr(),
           icon: Icons.settings_rounded,
           isPrimary: false,
           onTap: () => context.push(AppRoutes.settings),
@@ -307,7 +310,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const Icon(Icons.star_rounded, color: AppColors.accentGold, size: 18),
         const SizedBox(width: 6),
         Text(
-          'Unlocked: ${gameState.unlockedLevel} / 30,000',
+          'home.unlocked'.tr(
+            namedArgs: {'count': '${gameState.unlockedLevel}'},
+          ),
           style: const TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14,

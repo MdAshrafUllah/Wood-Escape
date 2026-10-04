@@ -26,6 +26,11 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>NSFaceIDUsageDescription</key>
     <string>Reset progress confirm korar jonno identity verify korun.</string>
+	<key>CFBundleLocalizations</key>
+    <array>
+	  <string>en</string>
+	  <string>bn</string>
+    </array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

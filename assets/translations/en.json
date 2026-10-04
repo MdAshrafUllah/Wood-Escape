@@ -1,0 +1,59 @@
+{
+  "app_title": "WoodEscape",
+  "home": {
+    "subtitle": "Unblock The Red Block",
+    "play": "PLAY (LEVEL {level})",
+    "select_level": "SELECT LEVEL",
+    "settings": "SETTINGS",
+    "unlocked": "Unlocked: {count} / 30,000"
+  },
+  "settings": {
+    "title": "SETTINGS",
+    "sound": "Sound Effects",
+    "sound_sub": "In-game move & completion sounds",
+    "music": "Background Music",
+    "music_sub": "Relaxing background wooden audio",
+    "haptics": "Haptic Feedback",
+    "haptics_sub": "Micro-taps when sliding blocks",
+    "vibration": "Vibration",
+    "vibration_sub": "Level completion & event vibration",
+    "reset": "Reset Progress",
+    "reset_sub": "Clear all unlocked levels and stars",
+    "reset_confirm_title": "RESET PROGRESS?",
+    "reset_confirm_msg": "This will permanently reset all game progress. Authentication required if device screen lock is set.",
+    "cancel": "CANCEL",
+    "confirm_reset": "RESET",
+    "reset_done": "All progress and settings have been reset.",
+    "auth_failed": "Authentication failed or cancelled.",
+    "version": "WoodEscape v1.0.0",
+    "language": "Language"
+  },
+  "game": {
+    "level": "LEVEL {level}",
+    "moves": "MOVES: {count}",
+    "instruction": "Slide blocks to clear exit path",
+    "no_solution": "No Solution",
+    "no_solution_msg": "No solution found for the current layout.",
+    "ok": "OK",
+    "passed": "LEVEL {level} PASSED!",
+    "completed_in": "Completed in {moves} moves!",
+    "best_possible": "Best possible: {moves} moves",
+    "play_again": "PLAY AGAIN",
+    "next_level": "NEXT LEVEL"
+  },
+  "level_select": {
+    "title": "SELECT LEVEL",
+    "campaign": "CAMPAIGN PROGRESS",
+    "unlocked_count": "Level {level} / 30,000 Unlocked",
+    "locked_msg": "Level {level} is locked! Complete previous levels first.",
+    "easy": "EASY",
+    "medium": "MEDIUM",
+    "hard": "HARD",
+    "expert": "EXPERT",
+    "legend": "LEGEND",
+    "master": "MASTER"
+  },
+  "splash": {
+    "subtitle": "UNBLOCK THE WAY"
+  }
+}

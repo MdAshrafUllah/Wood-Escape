@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -141,7 +142,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'LEVEL $level PASSED!',
+                  'game.passed'.tr(namedArgs: {'level': '$level'}),
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -151,7 +152,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Completed in $moves moves!',
+                  'game.completed_in'.tr(namedArgs: {'moves': '$moves'}),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -160,7 +161,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Best possible: $minMoves moves',
+                  'game.best_possible'.tr(namedArgs: {'moves': '$minMoves'}),
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.withAlpha(AppColors.splashTitleColor, 0.6),
@@ -186,9 +187,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           Navigator.of(context).pop();
                           ref.read(gameProvider.notifier).resetLevel();
                         },
-                        child: const Text(
-                          'PLAY AGAIN',
-                          style: TextStyle(
+                        child: Text(
+                          'game.play_again'.tr(),
+                          style: const TextStyle(
                             color: AppColors.splashTitleColor,
                             fontWeight: FontWeight.bold,
                           ),
@@ -211,9 +212,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           Navigator.of(context).pop();
                           ref.read(gameProvider.notifier).nextLevel();
                         },
-                        child: const Text(
-                          'NEXT LEVEL',
-                          style: TextStyle(
+                        child: Text(
+                          'game.next_level'.tr(),
+                          style: const TextStyle(
                             color: AppColors.white,
                             fontWeight: FontWeight.bold,
                           ),
@@ -316,6 +317,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   // Optimized Compact Header Widget
   Widget _buildHeaderCard(GameState gameState, dynamic board) {
+    final hasHistory = ref.watch(gameProvider.notifier).hasHistory;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -348,6 +351,20 @@ class _GameScreenState extends ConsumerState<GameScreen>
           IconButton(
             constraints: const BoxConstraints(),
             padding: const EdgeInsets.all(8),
+            icon: Icon(
+              Icons.undo_rounded,
+              color: hasHistory
+                  ? AppColors.textPrimary
+                  : AppColors.withAlpha(AppColors.textPrimary, 0.3),
+              size: 22,
+            ),
+            onPressed: hasHistory
+                ? () => ref.read(gameProvider.notifier).undo()
+                : null,
+          ),
+          IconButton(
+            constraints: const BoxConstraints(),
+            padding: const EdgeInsets.all(8),
             icon: const Icon(
               Icons.grid_view_rounded,
               color: AppColors.textPrimary,
@@ -375,7 +392,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'LEVEL ${gameState.currentLevel}',
+                      'game.level'.tr(
+                        namedArgs: {'level': '${gameState.currentLevel}'},
+                      ),
                       style: const TextStyle(
                         color: AppColors.splashTitleColor,
                         fontWeight: FontWeight.bold,
@@ -397,7 +416,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         ),
                       ),
                       child: Text(
-                        gameState.difficulty.displayName,
+                        gameState.difficulty.translationKey.tr(),
                         style: const TextStyle(
                           color: AppColors.accentGold,
                           fontSize: 9,
@@ -413,7 +432,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'MOVES: ${gameState.moveCount}',
+                      'game.moves'.tr(
+                        namedArgs: {'count': '${gameState.moveCount}'},
+                      ),
                       style: const TextStyle(
                         color: AppColors.accentGold,
                         fontWeight: FontWeight.bold,
@@ -458,8 +479,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 );
               } else {
                 AppDialog(context).info(
-                  title: 'No Solution',
-                  message: 'No solution found for the current layout.',
+                  title: 'game.no_solution'.tr(),
+                  message: 'game.no_solution_msg'.tr(),
                 );
               }
             },
@@ -477,7 +498,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
         color: AppColors.withAlpha(AppColors.cardSurface, 0.5),
         borderRadius: BorderRadius.circular(30),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
@@ -487,7 +508,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
           ),
           SizedBox(width: 6),
           Text(
-            'Slide blocks to clear exit path',
+            'game.instruction'.tr(),
             style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 12,
