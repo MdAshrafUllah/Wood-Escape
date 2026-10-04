@@ -15,6 +15,8 @@ class GameState {
   final int moveCount;
   final int minMoves;
   final bool isCompleted;
+  final bool canUndo;
+  final ExitSide exitSide;
   final LevelDifficulty difficulty;
 
   GameState({
@@ -22,9 +24,11 @@ class GameState {
     required this.unlockedLevel,
     required this.board,
     required this.difficulty,
+    required this.exitSide,
     this.moveCount = 0,
     this.minMoves = 10,
     this.isCompleted = false,
+    this.canUndo = false,
   });
 
   GameState copyWith({
@@ -32,18 +36,22 @@ class GameState {
     int? unlockedLevel,
     GameBoard? board,
     LevelDifficulty? difficulty,
+    ExitSide? exitSide,
     int? moveCount,
     int? minMoves,
     bool? isCompleted,
+    bool? canUndo,
   }) {
     return GameState(
       currentLevel: currentLevel ?? this.currentLevel,
       unlockedLevel: unlockedLevel ?? this.unlockedLevel,
       board: board ?? this.board,
       difficulty: difficulty ?? this.difficulty,
+      exitSide: exitSide ?? this.exitSide,
       moveCount: moveCount ?? this.moveCount,
       minMoves: minMoves ?? this.minMoves,
       isCompleted: isCompleted ?? this.isCompleted,
+      canUndo: canUndo ?? this.canUndo,
     );
   }
 
@@ -62,8 +70,7 @@ int calculateStars(int moves, int minMoves) {
 
 class GameNotifier extends Notifier<GameState> {
   final List<GameBoard> _history = [];
-
-  bool get hasHistory => _history.isNotEmpty;
+  static const int _maxHistoryLength = 100;
 
   static LevelDifficulty getDifficultyForLevel(int level) {
     return LevelGenerator.getDifficultyForLevel(level);
@@ -71,21 +78,22 @@ class GameNotifier extends Notifier<GameState> {
 
   @override
   GameState build() {
-    // 1. Storage থেকে আগের সেভ করা ডেটা লোড
     final savedProgress = ref.read(progressProvider);
     final level = savedProgress.currentLevel;
 
     _history.clear();
-    final (blocks, minMoves) = LevelGenerator.generate(level);
+    final generated = LevelGenerator.generate(level);
 
     return GameState(
       currentLevel: level,
       unlockedLevel: savedProgress.unlockedLevel,
-      board: GameBoard(blocks: blocks),
+      board: GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
       difficulty: getDifficultyForLevel(level),
+      exitSide: generated.exitSide,
       moveCount: 0,
-      minMoves: minMoves,
+      minMoves: generated.minMoves,
       isCompleted: false,
+      canUndo: false,
     );
   }
 
@@ -94,25 +102,31 @@ class GameNotifier extends Notifier<GameState> {
 
     if (level <= currentUnlocked) {
       _history.clear();
-      final (blocks, minMoves) = LevelGenerator.generate(level);
+      final generated = LevelGenerator.generate(level);
 
       state = state.copyWith(
         currentLevel: level,
         unlockedLevel: currentUnlocked,
-        board: GameBoard(blocks: blocks),
+        board: GameBoard(
+          blocks: generated.blocks,
+          exitSide: generated.exitSide,
+        ),
         difficulty: getDifficultyForLevel(level),
+        exitSide: generated.exitSide,
         moveCount: 0,
-        minMoves: minMoves,
+        minMoves: generated.minMoves,
         isCompleted: false,
+        canUndo: false,
       );
 
-      // Current level পারসিস্টেন্সের জন্য সেভ করা
       ref.read(progressProvider.notifier).setCurrentLevel(level);
     }
   }
 
   void slideBlock(Block block, int totalDeltaRow, int totalDeltaCol) {
-    if (state.isCompleted || (totalDeltaRow == 0 && totalDeltaCol == 0)) return;
+    if (state.isCompleted || (totalDeltaRow == 0 && totalDeltaCol == 0)) {
+      return;
+    }
 
     int maxSteps = 0;
     int stepR = totalDeltaRow.sign;
@@ -132,7 +146,7 @@ class GameNotifier extends Notifier<GameState> {
       HapticService().lightImpact();
 
       _history.add(state.board);
-      if (_history.length > 100) {
+      if (_history.length > _maxHistoryLength) {
         _history.removeAt(0);
       }
 
@@ -146,16 +160,19 @@ class GameNotifier extends Notifier<GameState> {
         return b;
       }).toList();
 
-      final updatedBoard = GameBoard(blocks: updatedBlocks);
+      final updatedBoard = GameBoard(
+        blocks: updatedBlocks,
+        exitSide: state.exitSide,
+      );
       final isWon = updatedBoard.isWinConditionMet();
 
       state = state.copyWith(
         board: updatedBoard,
         moveCount: state.moveCount + 1,
         isCompleted: isWon,
+        canUndo: true,
       );
 
-      // লেভেল জিতলে সাথে সাথে স্টার সেভ করা
       if (isWon) {
         AudioService().playSfx(AppAudio.win);
         HapticService().winVibration();
@@ -176,9 +193,9 @@ class GameNotifier extends Notifier<GameState> {
       board: previousBoard,
       moveCount: state.moveCount > 0 ? state.moveCount - 1 : 0,
       isCompleted: false,
+      canUndo: _history.isNotEmpty,
     );
 
-    // AudioService().playSfx(AppAudio.undo); // Pending asset
     HapticService().lightImpact();
   }
 
@@ -191,19 +208,20 @@ class GameNotifier extends Notifier<GameState> {
         : state.unlockedLevel;
 
     _history.clear();
-    final (blocks, minMoves) = LevelGenerator.generate(nextLevel);
+    final generated = LevelGenerator.generate(nextLevel);
 
     state = GameState(
       currentLevel: nextLevel,
       unlockedLevel: updatedUnlocked,
-      board: GameBoard(blocks: blocks),
+      board: GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
       difficulty: getDifficultyForLevel(nextLevel),
+      exitSide: generated.exitSide,
       moveCount: 0,
-      minMoves: minMoves,
+      minMoves: generated.minMoves,
       isCompleted: false,
+      canUndo: false,
     );
 
-    // 2. সেভ লেভেল স্টেট
     ref.read(progressProvider.notifier).setUnlockedLevel(updatedUnlocked);
     ref.read(progressProvider.notifier).setCurrentLevel(nextLevel);
   }
@@ -214,12 +232,15 @@ class GameNotifier extends Notifier<GameState> {
 
   void resetLevel() {
     _history.clear();
-    final (blocks, minMoves) = LevelGenerator.generate(state.currentLevel);
+    final generated = LevelGenerator.generate(state.currentLevel);
+
     state = state.copyWith(
-      board: GameBoard(blocks: blocks),
-      minMoves: minMoves,
+      board: GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
+      exitSide: generated.exitSide,
+      minMoves: generated.minMoves,
       moveCount: 0,
       isCompleted: false,
+      canUndo: false,
     );
   }
 }

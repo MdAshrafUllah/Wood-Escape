@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/core/utils/app_dialog.dart';
+import 'package:woodescape/domain/engine/game_board.dart';
 import 'package:woodescape/domain/engine/puzzle_solver.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
@@ -316,8 +317,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   // Optimized Compact Header Widget
-  Widget _buildHeaderCard(GameState gameState, dynamic board) {
-    final hasHistory = ref.watch(gameProvider.notifier).hasHistory;
+  Widget _buildHeaderCard(GameState gameState, GameBoard board) {
+    final canUndo = gameState.canUndo;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -353,12 +354,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
             padding: const EdgeInsets.all(8),
             icon: Icon(
               Icons.undo_rounded,
-              color: hasHistory
+              color: canUndo
                   ? AppColors.textPrimary
                   : AppColors.withAlpha(AppColors.textPrimary, 0.3),
               size: 22,
             ),
-            onPressed: hasHistory
+            onPressed: canUndo
                 ? () => ref.read(gameProvider.notifier).undo()
                 : null,
           ),
@@ -521,7 +522,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   // Board Graphics
-  Widget _buildGameBoard(dynamic board) {
+  Widget _buildGameBoard(GameBoard board) {
     const double borderWidth = 16.0;
 
     return LayoutBuilder(
@@ -584,7 +585,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     animation: _hintAnimationController,
                     builder: (context, child) {
                       return Stack(
-                        children: (board.blocks as List<Block>)
+                        children: board.blocks
                             .where((b) => !b.isTarget)
                             .map((block) => _buildBlock(block, ref, cellSize))
                             .toList(),
@@ -603,16 +604,13 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 child: AnimatedBuilder(
                   animation: _hintAnimationController,
                   builder: (context, child) {
-                    final targetBlock = (board.blocks as List<Block>)
-                        .firstWhere(
-                          (b) => b.isTarget,
-                          orElse: () => board.blocks.first,
-                        );
+                    final targetBlock = board.blocks.firstWhere(
+                      (b) => b.isTarget,
+                      orElse: () => board.blocks.first,
+                    );
                     return Stack(
                       children: [
-                        if ((board.blocks as List<Block>).any(
-                          (b) => b.isTarget,
-                        ))
+                        if (board.blocks.any((b) => b.isTarget))
                           _buildBlock(targetBlock, ref, cellSize),
                       ],
                     );
@@ -620,101 +618,173 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
               ),
 
-              // 3. Wooden Frames
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: borderWidth,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.frameBorderLight,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                  ),
-                ),
+              ..._buildFrames(
+                borderWidth: borderWidth,
+                boardInnerWidth: boardInnerWidth,
+                cellSize: cellSize,
+                exitSide: board.exitSide,
               ),
 
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: borderWidth,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.frameBorderLight,
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-
-              Positioned(
-                top: 0,
-                bottom: 0,
-                left: 0,
-                width: borderWidth,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.frameBorderDark,
-                    borderRadius: BorderRadius.horizontal(
-                      left: Radius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-
-              Positioned(
-                top: 0,
-                right: 0,
-                width: borderWidth,
-                height: borderWidth + (2 * cellSize),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.frameBorderDark,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-
-              Positioned(
-                bottom: 0,
-                right: 0,
-                width: borderWidth,
-                height: borderWidth + (3 * cellSize),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.frameBorderDark,
-                    borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Exit Arrow
-              Positioned(
-                right: 1,
-                top: borderWidth + (2 * cellSize) + (cellSize / 2) - 10,
-                width: borderWidth - 2,
-                height: 20,
-                child: const Center(
-                  child: Icon(
-                    Icons.keyboard_double_arrow_right_rounded,
-                    color: AppColors.accentGold,
-                    size: 16,
-                  ),
-                ),
+              _buildExitArrow(
+                borderWidth: borderWidth,
+                cellSize: cellSize,
+                exitSide: board.exitSide,
               ),
             ],
           ),
         );
       },
     );
+  }
+
+  List<Widget> _buildFrames({
+    required double borderWidth,
+    required double boardInnerWidth,
+    required double cellSize,
+    required ExitSide exitSide,
+  }) {
+    const double radius = 20;
+    final gapLength = cellSize;
+    Widget buildHorizontalFrame({
+      required bool hasGap,
+      required Color color,
+      required BorderRadius borderRadius,
+    }) {
+      if (!hasGap) {
+        return Container(
+          decoration: BoxDecoration(color: color, borderRadius: borderRadius),
+        );
+      }
+      return Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.only(
+                  topLeft: borderRadius.topLeft,
+                  bottomLeft: borderRadius.bottomLeft,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: gapLength),
+          Expanded(
+            flex: 3,
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.only(
+                  topRight: borderRadius.topRight,
+                  bottomRight: borderRadius.bottomRight,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    Widget buildVerticalFrame({
+      required bool hasGap,
+      required Color color,
+      required BorderRadius borderRadius,
+    }) {
+      if (!hasGap) {
+        return Container(
+          decoration: BoxDecoration(color: color, borderRadius: borderRadius),
+        );
+      }
+      return Column(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.only(
+                  topLeft: borderRadius.topLeft,
+                  topRight: borderRadius.topRight,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: gapLength),
+          Expanded(
+            flex: 3,
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: borderRadius.bottomLeft,
+                  bottomRight: borderRadius.bottomRight,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return [
+      // Top frame
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: borderWidth,
+        child: buildHorizontalFrame(
+          hasGap: exitSide == ExitSide.top,
+          color: AppColors.frameBorderLight,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(radius),
+          ),
+        ),
+      ),
+      // Bottom frame
+      Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: borderWidth,
+        child: buildHorizontalFrame(
+          hasGap: exitSide == ExitSide.bottom,
+          color: AppColors.frameBorderLight,
+          borderRadius: const BorderRadius.vertical(
+            bottom: Radius.circular(radius),
+          ),
+        ),
+      ),
+      // Left frame
+      Positioned(
+        top: 0,
+        bottom: 0,
+        left: 0,
+        width: borderWidth,
+        child: buildVerticalFrame(
+          hasGap: exitSide == ExitSide.left,
+          color: AppColors.frameBorderDark,
+          borderRadius: const BorderRadius.horizontal(
+            left: Radius.circular(radius),
+          ),
+        ),
+      ),
+      // Right frame
+      Positioned(
+        top: 0,
+        bottom: 0,
+        right: 0,
+        width: borderWidth,
+        child: buildVerticalFrame(
+          hasGap: exitSide == ExitSide.right,
+          color: AppColors.frameBorderDark,
+          borderRadius: const BorderRadius.horizontal(
+            right: Radius.circular(radius),
+          ),
+        ),
+      ),
+    ];
   }
 
   // Block Widget
@@ -868,5 +938,73 @@ class _GameScreenState extends ConsumerState<GameScreen>
         ),
       ),
     );
+  }
+
+  Widget _buildExitArrow({
+    required double borderWidth,
+    required double cellSize,
+    required ExitSide exitSide,
+  }) {
+    const arrowSize = 20.0;
+    final centerOffset = borderWidth + (2 * cellSize) + (cellSize / 2);
+
+    switch (exitSide) {
+      case ExitSide.right:
+        return Positioned(
+          right: 1,
+          top: centerOffset - (arrowSize / 2),
+          width: borderWidth - 2,
+          height: arrowSize,
+          child: const Center(
+            child: Icon(
+              Icons.keyboard_double_arrow_right_rounded,
+              color: AppColors.accentGold,
+              size: 16,
+            ),
+          ),
+        );
+      case ExitSide.left:
+        return Positioned(
+          left: 1,
+          top: centerOffset - (arrowSize / 2),
+          width: borderWidth - 2,
+          height: arrowSize,
+          child: const Center(
+            child: Icon(
+              Icons.keyboard_double_arrow_left_rounded,
+              color: AppColors.accentGold,
+              size: 16,
+            ),
+          ),
+        );
+      case ExitSide.top:
+        return Positioned(
+          top: 1,
+          left: centerOffset - (arrowSize / 2),
+          width: arrowSize,
+          height: borderWidth - 2,
+          child: const Center(
+            child: Icon(
+              Icons.keyboard_double_arrow_up_rounded,
+              color: AppColors.accentGold,
+              size: 16,
+            ),
+          ),
+        );
+      case ExitSide.bottom:
+        return Positioned(
+          bottom: 1,
+          left: centerOffset - (arrowSize / 2),
+          width: arrowSize,
+          height: borderWidth - 2,
+          child: const Center(
+            child: Icon(
+              Icons.keyboard_double_arrow_down_rounded,
+              color: AppColors.accentGold,
+              size: 16,
+            ),
+          ),
+        );
+    }
   }
 }

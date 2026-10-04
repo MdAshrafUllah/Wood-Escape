@@ -12,58 +12,60 @@ void main() {
 
   group('LevelGenerator - Basic Generation', () {
     test('generates a puzzle for level 1', () {
-      final (blocks, minMoves) = LevelGenerator.generate(1);
-      expect(blocks, isNotEmpty);
-      expect(blocks.any((b) => b.isTarget), isTrue);
-      expect(minMoves, greaterThan(0));
+      final generated = LevelGenerator.generate(1);
+      expect(generated.blocks, isNotEmpty);
+      expect(generated.blocks.any((b) => b.isTarget), isTrue);
+      expect(generated.minMoves, greaterThan(0));
     });
 
     test('generates a puzzle for a mid-range level', () {
-      final (blocks, minMoves) = LevelGenerator.generate(5000);
-      expect(blocks, isNotEmpty);
-      expect(minMoves, greaterThan(0));
+      final generated = LevelGenerator.generate(5000);
+      expect(generated.blocks, isNotEmpty);
+      expect(generated.minMoves, greaterThan(0));
     });
 
     test('generates a puzzle for the max level', () {
-      final (blocks, minMoves) = LevelGenerator.generate(30000);
-      expect(blocks, isNotEmpty);
-      expect(minMoves, greaterThan(0));
+      final generated = LevelGenerator.generate(30000);
+      expect(generated.blocks, isNotEmpty);
+      expect(generated.minMoves, greaterThan(0));
     });
 
     test('every generated level has exactly one target block', () {
       for (int level = 1; level <= 100; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        final targetCount = blocks.where((b) => b.isTarget).length;
+        final generated = LevelGenerator.generate(level);
+        final targetCount = generated.blocks.where((b) => b.isTarget).length;
         expect(targetCount, 1, reason: 'Level $level target count');
       }
     });
 
-    test('target block is always at row 2', () {
+    test('target block orientation matches exit side', () {
       for (int level = 1; level <= 100; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        final target = blocks.firstWhere((b) => b.isTarget);
-        expect(target.row, 2, reason: 'Level $level target row');
-      }
-    });
+        final generated = LevelGenerator.generate(level);
+        final target = generated.blocks.firstWhere((b) => b.isTarget);
+        final exitSide = generated.exitSide;
 
-    test('target block is always horizontal length 2', () {
-      for (int level = 1; level <= 100; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        final target = blocks.firstWhere((b) => b.isTarget);
+        if (exitSide == ExitSide.right || exitSide == ExitSide.left) {
+          expect(
+            target.orientation,
+            BlockOrientation.horizontal,
+            reason: 'Level $level horizontal target for $exitSide',
+          );
+        } else {
+          expect(
+            target.orientation,
+            BlockOrientation.vertical,
+            reason: 'Level $level vertical target for $exitSide',
+          );
+        }
         expect(target.length, 2, reason: 'Level $level target length');
-        expect(
-          target.orientation,
-          BlockOrientation.horizontal,
-          reason: 'Level $level target orientation',
-        );
       }
     });
 
     test('no blocks overlap in any generated level', () {
       for (int level = 1; level <= 200; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
+        final generated = LevelGenerator.generate(level);
         expect(
-          _hasOverlap(blocks),
+          _hasOverlap(generated.blocks),
           isFalse,
           reason: 'Level $level has overlapping blocks',
         );
@@ -74,20 +76,24 @@ void main() {
   group('LevelGenerator - Solvability', () {
     test('every generated level is solvable (1..200)', () {
       for (int level = 1; level <= 200; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        final solution = PuzzleSolver.solve(GameBoard(blocks: blocks));
+        final generated = LevelGenerator.generate(level);
+        final solution = PuzzleSolver.solve(
+          GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
+        );
         expect(solution, isNotNull, reason: 'Level $level unsolvable');
       }
     });
 
     test('reported minMoves matches solver result (1..100)', () {
       for (int level = 1; level <= 100; level++) {
-        final (blocks, reportedMinMoves) = LevelGenerator.generate(level);
-        final solution = PuzzleSolver.solve(GameBoard(blocks: blocks));
+        final generated = LevelGenerator.generate(level);
+        final solution = PuzzleSolver.solve(
+          GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
+        );
         expect(solution, isNotNull);
         expect(
           solution!.length,
-          reportedMinMoves,
+          generated.minMoves,
           reason: 'Level $level minMoves mismatch',
         );
       }
@@ -97,28 +103,32 @@ void main() {
   group('LevelGenerator - Determinism', () {
     test('same level produces identical layout across calls', () {
       LevelGenerator.clearCacheForTest();
-      final (blocks1, min1) = LevelGenerator.generate(42);
+      final gen1 = LevelGenerator.generate(42);
 
       LevelGenerator.clearCacheForTest();
-      final (blocks2, min2) = LevelGenerator.generate(42);
+      final gen2 = LevelGenerator.generate(42);
 
-      expect(min1, min2);
-      expect(_signature(blocks1), _signature(blocks2));
+      expect(gen1.minMoves, gen2.minMoves);
+      expect(gen1.exitSide, gen2.exitSide);
+      expect(
+        _signature(gen1.blocks, gen1.exitSide),
+        _signature(gen2.blocks, gen2.exitSide),
+      );
     });
 
     test('sequential generation is deterministic across sessions', () {
       LevelGenerator.clearCacheForTest();
       final sig1 = <String>[];
       for (int level = 1; level <= 50; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        sig1.add(_signature(blocks));
+        final generated = LevelGenerator.generate(level);
+        sig1.add(_signature(generated.blocks, generated.exitSide));
       }
 
       LevelGenerator.clearCacheForTest();
       final sig2 = <String>[];
       for (int level = 1; level <= 50; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        sig2.add(_signature(blocks));
+        final generated = LevelGenerator.generate(level);
+        sig2.add(_signature(generated.blocks, generated.exitSide));
       }
 
       expect(sig1, sig2);
@@ -129,8 +139,8 @@ void main() {
     test('first 500 levels are all unique', () {
       final seen = <String>{};
       for (int level = 1; level <= 500; level++) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        final sig = _signature(blocks);
+        final generated = LevelGenerator.generate(level);
+        final sig = _signature(generated.blocks, generated.exitSide);
         expect(
           seen.contains(sig),
           isFalse,
@@ -170,11 +180,32 @@ void main() {
       ];
       final seen = <String>{};
       for (final level in sampleLevels) {
-        final (blocks, _) = LevelGenerator.generate(level);
-        final sig = _signature(blocks);
+        final generated = LevelGenerator.generate(level);
+        final sig = _signature(generated.blocks, generated.exitSide);
         expect(seen.contains(sig), isFalse, reason: 'Level $level collides');
         seen.add(sig);
       }
+    });
+  });
+
+  group('LevelGenerator - Exit Side Distribution', () {
+    test('all 4 exit sides appear within first 20 levels', () {
+      final sides = <ExitSide>{};
+      for (int level = 1; level <= 20; level++) {
+        final generated = LevelGenerator.generate(level);
+        sides.add(generated.exitSide);
+      }
+      expect(sides.length, 4, reason: 'Expected all 4 exit sides');
+    });
+
+    test('same level always yields same exit side', () {
+      LevelGenerator.clearCacheForTest();
+      final side1 = LevelGenerator.generate(77).exitSide;
+
+      LevelGenerator.clearCacheForTest();
+      final side2 = LevelGenerator.generate(77).exitSide;
+
+      expect(side1, side2);
     });
   });
 
@@ -223,8 +254,8 @@ void main() {
         int total = 0;
         int count = 0;
         for (int level = start; level <= end; level += 10) {
-          final (blocks, _) = LevelGenerator.generate(level);
-          total += blocks.where((b) => !b.isTarget).length;
+          final generated = LevelGenerator.generate(level);
+          total += generated.blocks.where((b) => !b.isTarget).length;
           count++;
         }
         return total / count;
@@ -271,9 +302,9 @@ void main() {
 
   group('LevelGenerator - Fallback Safety', () {
     test('fallback layout is returned when all attempts fail', () {
-      final (blocks, minMoves) = LevelGenerator.generate(1);
-      expect(blocks.length, greaterThanOrEqualTo(2));
-      expect(minMoves, greaterThan(0));
+      final generated = LevelGenerator.generate(1);
+      expect(generated.blocks.length, greaterThanOrEqualTo(2));
+      expect(generated.minMoves, greaterThan(0));
     });
 
     test('extreme level number does not crash', () {
@@ -283,7 +314,7 @@ void main() {
   });
 }
 
-String _signature(List<Block> blocks) {
+String _signature(List<Block> blocks, ExitSide exitSide) {
   final tokens =
       blocks
           .map(
@@ -292,7 +323,7 @@ String _signature(List<Block> blocks) {
           )
           .toList()
         ..sort();
-  return tokens.join('|');
+  return '${exitSide.name}|${tokens.join('|')}';
 }
 
 bool _hasOverlap(List<Block> blocks) {

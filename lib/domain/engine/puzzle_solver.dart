@@ -30,7 +30,10 @@ class PuzzleSolver {
 
     while (queue.isNotEmpty) {
       final currentBlocks = queue.removeFirst();
-      final currentBoard = GameBoard(blocks: currentBlocks);
+      final currentBoard = GameBoard(
+        blocks: currentBlocks,
+        exitSide: board.exitSide,
+      );
 
       if (currentBoard.isWinConditionMet()) {
         return _reconstructPath(parentMap, currentBlocks);

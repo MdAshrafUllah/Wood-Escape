@@ -1,10 +1,12 @@
 import '../models/block.dart';
+import '../models/level_data.dart';
 
 class GameBoard {
   final int gridSize = 6;
   final List<Block> blocks;
+  final ExitSide exitSide;
 
-  GameBoard({required this.blocks});
+  GameBoard({required this.blocks, required this.exitSide});
 
   bool isCellOccupied(int row, int col, String currentBlockId) {
     if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
@@ -98,11 +100,23 @@ class GameBoard {
   }
 
   bool isWinConditionMet() {
-    try {
-      final target = blocks.firstWhere((b) => b.isTarget);
-      return target.col + target.length == gridSize;
-    } catch (_) {
-      return false;
+    final target = blocks.firstWhere(
+      (b) => b.isTarget,
+      orElse: () => blocks.first,
+    );
+    switch (exitSide) {
+      case ExitSide.right:
+        return target.orientation == BlockOrientation.horizontal &&
+            target.col + target.length == gridSize;
+      case ExitSide.left:
+        return target.orientation == BlockOrientation.horizontal &&
+            target.col == 0;
+      case ExitSide.top:
+        return target.orientation == BlockOrientation.vertical &&
+            target.row == 0;
+      case ExitSide.bottom:
+        return target.orientation == BlockOrientation.vertical &&
+            target.row + target.length == gridSize;
     }
   }
 }

@@ -1,3 +1,5 @@
+enum ExitSide { top, bottom, left, right }
+
 enum LevelDifficulty { easy, medium, hard, expert, legend, master }
 
 extension LevelDifficultyX on LevelDifficulty {

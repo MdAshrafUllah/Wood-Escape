@@ -5,46 +5,86 @@ import 'package:woodescape/domain/engine/puzzle_solver.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
 
+class GeneratedLevel {
+  final List<Block> blocks;
+  final int minMoves;
+  final ExitSide exitSide;
+  const GeneratedLevel(this.blocks, this.minMoves, this.exitSide);
+}
+
 class LevelGenerator {
-  static final Map<int, (List<Block>, int)> _cache = {};
+  static final Map<int, GeneratedLevel> _cache = {};
   static final Set<String> _generatedSignatures = {};
 
-  static (List<Block>, int) generate(int level) {
-    if (level == 1) {
-      final blocks = _getFallbackLayout();
-      final sig = _getSignature(blocks);
-      _generatedSignatures.add(sig);
-      return (blocks, 2);
-    }
+  static GeneratedLevel generate(int level) {
+    if (level == 1) return _returnFallback();
     if (_cache.containsKey(level)) return _cache[level]!;
 
-    final difficulty = getDifficultyForLevel(level);
     final baseSeed = level * 999999937;
+    final difficulty = getDifficultyForLevel(level);
 
     int maxAttempts = 2000;
     for (int i = 0; i < maxAttempts; i++) {
       final rng = Random(baseSeed + (i * 12345));
-      final blocks = _generateLayout(rng, difficulty);
+      final exitSide = _pickExitSide(level);
+      final blocks = _generateLayout(rng, difficulty, exitSide);
 
-      final sig = _getSignature(blocks);
+      final sig = _getSignature(blocks, exitSide);
       if (_generatedSignatures.contains(sig)) continue;
 
-      final board = GameBoard(blocks: blocks);
+      final board = GameBoard(blocks: blocks, exitSide: exitSide);
       final solution = PuzzleSolver.solve(board);
 
       if (solution != null &&
           solution.length >= _getMinMoveThreshold(difficulty)) {
         _generatedSignatures.add(sig);
-        final result = (blocks, solution.length);
+        final result = GeneratedLevel(blocks, solution.length, exitSide);
         _cache[level] = result;
         return result;
       }
     }
 
-    return (_getFallbackLayout(), 2);
+    return _returnFallback();
   }
 
-  static String _getSignature(List<Block> blocks) {
+  static ExitSide _pickExitSide(int level) => ExitSide.values[level % 4];
+
+  static GeneratedLevel _returnFallback() {
+    final fallback = GeneratedLevel(
+      [
+        Block(
+          id: 'target',
+          isTarget: true,
+          orientation: BlockOrientation.horizontal,
+          length: 2,
+          row: 2,
+          col: 0,
+        ),
+        Block(
+          id: 'v1',
+          isTarget: false,
+          orientation: BlockOrientation.vertical,
+          length: 2,
+          row: 0,
+          col: 2,
+        ),
+        Block(
+          id: 'h1',
+          isTarget: false,
+          orientation: BlockOrientation.horizontal,
+          length: 3,
+          row: 4,
+          col: 1,
+        ),
+      ],
+      2,
+      ExitSide.right,
+    );
+    _generatedSignatures.add(_getSignature(fallback.blocks, fallback.exitSide));
+    return fallback;
+  }
+
+  static String _getSignature(List<Block> blocks, ExitSide exitSide) {
     final tokens =
         blocks
             .map(
@@ -53,44 +93,15 @@ class LevelGenerator {
             )
             .toList()
           ..sort();
-    return tokens.join('|');
+    return '${exitSide.name}|${tokens.join('|')}';
   }
 
-  static String getSignatureForTest(List<Block> blocks) =>
-      _getSignature(blocks);
+  static String getSignatureForTest(List<Block> blocks, ExitSide exitSide) =>
+      _getSignature(blocks, exitSide);
 
   static void clearCacheForTest() {
     _cache.clear();
     _generatedSignatures.clear();
-  }
-
-  static List<Block> _getFallbackLayout() {
-    return [
-      Block(
-        id: 'target',
-        isTarget: true,
-        orientation: BlockOrientation.horizontal,
-        length: 2,
-        row: 2,
-        col: 0,
-      ),
-      Block(
-        id: 'v1',
-        isTarget: false,
-        orientation: BlockOrientation.vertical,
-        length: 2,
-        row: 0,
-        col: 2,
-      ),
-      Block(
-        id: 'h1',
-        isTarget: false,
-        orientation: BlockOrientation.horizontal,
-        length: 3,
-        row: 4,
-        col: 1,
-      ),
-    ];
   }
 
   static int _getMinMoveThreshold(LevelDifficulty diff) {
@@ -119,22 +130,66 @@ class LevelGenerator {
     return LevelDifficulty.master;
   }
 
-  static List<Block> _generateLayout(Random rng, LevelDifficulty diff) {
+  static List<Block> _generateLayout(
+    Random rng,
+    LevelDifficulty diff,
+    ExitSide exitSide,
+  ) {
     final blocks = <Block>[];
-    blocks.add(
-      Block(
-        id: 'target',
-        isTarget: true,
-        orientation: BlockOrientation.horizontal,
-        length: 2,
-        row: 2,
-        col: rng.nextInt(3),
-      ),
-    );
+
+    switch (exitSide) {
+      case ExitSide.right:
+        blocks.add(
+          Block(
+            id: 'target',
+            isTarget: true,
+            orientation: BlockOrientation.horizontal,
+            length: 2,
+            row: 2,
+            col: rng.nextInt(3),
+          ),
+        );
+        break;
+      case ExitSide.left:
+        blocks.add(
+          Block(
+            id: 'target',
+            isTarget: true,
+            orientation: BlockOrientation.horizontal,
+            length: 2,
+            row: 2,
+            col: 2 + rng.nextInt(3),
+          ),
+        );
+        break;
+      case ExitSide.top:
+        blocks.add(
+          Block(
+            id: 'target',
+            isTarget: true,
+            orientation: BlockOrientation.vertical,
+            length: 2,
+            col: 2,
+            row: 2 + rng.nextInt(3),
+          ),
+        );
+        break;
+      case ExitSide.bottom:
+        blocks.add(
+          Block(
+            id: 'target',
+            isTarget: true,
+            orientation: BlockOrientation.vertical,
+            length: 2,
+            col: 2,
+            row: rng.nextInt(3),
+          ),
+        );
+        break;
+    }
 
     final obstacleCount = _getObstacleCount(diff, rng);
     int attempts = 0;
-
     while (blocks.length < obstacleCount + 1 && attempts < 1000) {
       attempts++;
       final len = rng.nextInt(2) + 2;
