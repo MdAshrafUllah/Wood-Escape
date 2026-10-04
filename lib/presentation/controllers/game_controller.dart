@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:woodescape/core/constants/app_audio.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/domain/engine/game_board.dart';
+import 'package:woodescape/domain/engine/level_generator.dart';
 import 'package:woodescape/domain/models/block.dart';
 import 'package:woodescape/domain/models/level_data.dart';
 import 'package:woodescape/services/audio_service.dart';
@@ -65,566 +66,7 @@ class GameNotifier extends Notifier<GameState> {
   bool get hasHistory => _history.isNotEmpty;
 
   static LevelDifficulty getDifficultyForLevel(int level) {
-    if (level <= 5000) return LevelDifficulty.easy;
-    if (level <= 10000) return LevelDifficulty.medium;
-    if (level <= 15000) return LevelDifficulty.hard;
-    if (level <= 20000) return LevelDifficulty.expert;
-    if (level <= 25000) return LevelDifficulty.legend;
-    return LevelDifficulty.master;
-  }
-
-  static List<Block> generateLevel(int level) {
-    final difficulty = getDifficultyForLevel(level);
-
-    switch (difficulty) {
-      case LevelDifficulty.easy:
-        return _generateEasyLevel(level);
-      case LevelDifficulty.medium:
-        return _generateMediumLevel(level);
-      case LevelDifficulty.hard:
-        return _generateHardLevel(level);
-      case LevelDifficulty.expert:
-        return _generateExpertLevel(level);
-      case LevelDifficulty.legend:
-        return _generateLegendLevel(level);
-      case LevelDifficulty.master:
-        return _generateMasterLevel(level);
-    }
-  }
-
-  // --- EASY LAYOUTS (Level 1 - 20) ---
-  static List<Block> _generateEasyLevel(int level) {
-    int variant = (level - 1) % 5;
-    if (variant == 0) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 0,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 0,
-          col: 2,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 4,
-          col: 1,
-        ),
-      ];
-    } else if (variant == 1) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 1,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 3,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 5,
-          col: 2,
-        ),
-      ];
-    } else if (variant == 2) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 0,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 1,
-          col: 2,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 3,
-          col: 3,
-        ),
-      ];
-    } else if (variant == 3) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 1,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 1,
-          col: 4,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 0,
-          col: 0,
-        ),
-      ];
-    } else {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 0,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 2,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 4,
-          col: 0,
-        ),
-      ];
-    }
-  }
-
-  // --- MEDIUM LAYOUTS ---
-  static List<Block> _generateMediumLevel(int level) {
-    int variant = (level - 21) % 4;
-    if (variant == 0) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 1,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 3,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 1,
-          col: 0,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 3,
-          col: 1,
-        ),
-        Block(
-          id: 'h2',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 5,
-          col: 2,
-        ),
-      ];
-    } else if (variant == 1) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 0,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 2,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 0,
-          col: 0,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 1,
-          col: 5,
-        ),
-        Block(
-          id: 'h2',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 5,
-          col: 2,
-        ),
-      ];
-    } else if (variant == 2) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 2,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 0,
-          col: 1,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 0,
-          col: 2,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 2,
-          col: 4,
-        ),
-        Block(
-          id: 'h2',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 4,
-          col: 1,
-        ),
-      ];
-    } else {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 1,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 0,
-          col: 0,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 0,
-          col: 3,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 1,
-          col: 3,
-        ),
-        Block(
-          id: 'h2',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 5,
-          col: 0,
-        ),
-      ];
-    }
-  }
-
-  // --- HARD LAYOUTS ---
-  static List<Block> _generateHardLevel(int level) {
-    int variant = (level - 51) % 3;
-    if (variant == 0) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 1,
-        ),
-        Block(
-          id: 'v_left',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 0,
-        ),
-        Block(
-          id: 'v_top',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 0,
-          col: 1,
-        ),
-        Block(
-          id: 'v_mid',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 3,
-        ),
-        Block(
-          id: 'v_right',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 5,
-        ),
-        Block(
-          id: 'v_center_bottom',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 4,
-          col: 2,
-        ),
-        Block(
-          id: 'h_mid_1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 3,
-          col: 3,
-        ),
-        Block(
-          id: 'h_bottom',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 5,
-          col: 3,
-        ),
-      ];
-    } else if (variant == 1) {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 1,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 0,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 2,
-          row: 0,
-          col: 3,
-        ),
-        Block(
-          id: 'v3',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 5,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 3,
-          col: 3,
-        ),
-        Block(
-          id: 'h2',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 4,
-          col: 0,
-        ),
-        Block(
-          id: 'h3',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 5,
-          col: 3,
-        ),
-      ];
-    } else {
-      return [
-        Block(
-          id: 'target',
-          isTarget: true,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 2,
-          col: 0,
-        ),
-        Block(
-          id: 'v1',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 2,
-        ),
-        Block(
-          id: 'v2',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 3,
-        ),
-        Block(
-          id: 'v3',
-          isTarget: false,
-          orientation: BlockOrientation.vertical,
-          length: 3,
-          row: 0,
-          col: 4,
-        ),
-        Block(
-          id: 'h1',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 3,
-          col: 0,
-        ),
-        Block(
-          id: 'h2',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 3,
-          row: 4,
-          col: 2,
-        ),
-        Block(
-          id: 'h3',
-          isTarget: false,
-          orientation: BlockOrientation.horizontal,
-          length: 2,
-          row: 5,
-          col: 0,
-        ),
-      ];
-    }
-  }
-
-  static List<Block> _generateExpertLevel(int level) =>
-      _generateHardLevel(level);
-  static List<Block> _generateLegendLevel(int level) =>
-      _generateHardLevel(level);
-  static List<Block> _generateMasterLevel(int level) =>
-      _generateHardLevel(level);
-
-  static int getMinMovesForLevel(int level) {
-    final diff = getDifficultyForLevel(level);
-    switch (diff) {
-      case LevelDifficulty.easy:
-        return 5 + (level % 3);
-      case LevelDifficulty.medium:
-        return 8 + (level % 4);
-      case LevelDifficulty.hard:
-        return 12 + (level % 5);
-      case LevelDifficulty.expert:
-        return 16 + (level % 6);
-      case LevelDifficulty.legend:
-        return 22 + (level % 8);
-      case LevelDifficulty.master:
-        return 28 + (level % 10);
-    }
+    return LevelGenerator.getDifficultyForLevel(level);
   }
 
   @override
@@ -634,14 +76,15 @@ class GameNotifier extends Notifier<GameState> {
     final level = savedProgress.currentLevel;
 
     _history.clear();
+    final (blocks, minMoves) = LevelGenerator.generate(level);
 
     return GameState(
       currentLevel: level,
       unlockedLevel: savedProgress.unlockedLevel,
-      board: GameBoard(blocks: generateLevel(level)),
+      board: GameBoard(blocks: blocks),
       difficulty: getDifficultyForLevel(level),
       moveCount: 0,
-      minMoves: getMinMovesForLevel(level),
+      minMoves: minMoves,
       isCompleted: false,
     );
   }
@@ -651,13 +94,15 @@ class GameNotifier extends Notifier<GameState> {
 
     if (level <= currentUnlocked) {
       _history.clear();
+      final (blocks, minMoves) = LevelGenerator.generate(level);
+
       state = state.copyWith(
         currentLevel: level,
         unlockedLevel: currentUnlocked,
-        board: GameBoard(blocks: generateLevel(level)),
+        board: GameBoard(blocks: blocks),
         difficulty: getDifficultyForLevel(level),
         moveCount: 0,
-        minMoves: getMinMovesForLevel(level),
+        minMoves: minMoves,
         isCompleted: false,
       );
 
@@ -687,6 +132,9 @@ class GameNotifier extends Notifier<GameState> {
       HapticService().lightImpact();
 
       _history.add(state.board);
+      if (_history.length > 100) {
+        _history.removeAt(0);
+      }
 
       final updatedBlocks = state.board.blocks.map((b) {
         if (b.id == block.id) {
@@ -719,6 +167,7 @@ class GameNotifier extends Notifier<GameState> {
   }
 
   void undo() {
+    if (state.isCompleted) return;
     if (_history.isEmpty) return;
 
     final previousBoard = _history.removeLast();
@@ -729,7 +178,7 @@ class GameNotifier extends Notifier<GameState> {
       isCompleted: false,
     );
 
-    AudioService().playSfx(AppAudio.move);
+    // AudioService().playSfx(AppAudio.undo); // Pending asset
     HapticService().lightImpact();
   }
 
@@ -742,14 +191,15 @@ class GameNotifier extends Notifier<GameState> {
         : state.unlockedLevel;
 
     _history.clear();
+    final (blocks, minMoves) = LevelGenerator.generate(nextLevel);
 
     state = GameState(
       currentLevel: nextLevel,
       unlockedLevel: updatedUnlocked,
-      board: GameBoard(blocks: generateLevel(nextLevel)),
+      board: GameBoard(blocks: blocks),
       difficulty: getDifficultyForLevel(nextLevel),
       moveCount: 0,
-      minMoves: getMinMovesForLevel(nextLevel),
+      minMoves: minMoves,
       isCompleted: false,
     );
 
@@ -764,8 +214,10 @@ class GameNotifier extends Notifier<GameState> {
 
   void resetLevel() {
     _history.clear();
+    final (blocks, minMoves) = LevelGenerator.generate(state.currentLevel);
     state = state.copyWith(
-      board: GameBoard(blocks: generateLevel(state.currentLevel)),
+      board: GameBoard(blocks: blocks),
+      minMoves: minMoves,
       moveCount: 0,
       isCompleted: false,
     );
