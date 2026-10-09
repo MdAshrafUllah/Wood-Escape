@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/core/utils/app_snackbar.dart';
+import 'package:woodescape/core/utils/localized_number.dart';
+import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/domain/models/level_data.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/haptic_service.dart';
@@ -20,6 +22,7 @@ class LevelSelectScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameProvider);
+    final progress = ref.watch(progressProvider);
     final selectedDifficulty = ref.watch(selectedTabProvider);
 
     int startLevel = 1;
@@ -122,7 +125,13 @@ class LevelSelectScreen extends ConsumerWidget {
                       const SizedBox(height: 6),
                       Text(
                         'level_select.unlocked_count'.tr(
-                          namedArgs: {'level': '${gameState.unlockedLevel}'},
+                          namedArgs: {
+                            'level': localizedNumber(
+                              context,
+                              gameState.unlockedLevel,
+                            ),
+                            'total': localizedNumber(context, 30000),
+                          },
                         ),
                         style: const TextStyle(
                           color: AppColors.white,
@@ -241,6 +250,7 @@ class LevelSelectScreen extends ConsumerWidget {
                 itemCount: levelCount,
                 itemBuilder: (context, index) {
                   final levelNumber = startLevel + index;
+                  final earnedStars = progress.stars[levelNumber] ?? 0;
                   final isUnlocked = levelNumber <= gameState.unlockedLevel;
                   final isCurrent = levelNumber == gameState.currentLevel;
 
@@ -256,7 +266,9 @@ class LevelSelectScreen extends ConsumerWidget {
                         HapticService().mediumImpact();
                         AppSnackbar(context).locked(
                           'level_select.locked_msg'.tr(
-                            namedArgs: {'level': '$levelNumber'},
+                            namedArgs: {
+                              'level': localizedNumber(context, levelNumber),
+                            },
                           ),
                         );
                       }
@@ -307,7 +319,7 @@ class LevelSelectScreen extends ConsumerWidget {
                         children: [
                           if (isUnlocked) ...[
                             Text(
-                              '$levelNumber',
+                              localizedNumber(context, levelNumber),
                               style: TextStyle(
                                 color: isCurrent
                                     ? AppColors.white
@@ -319,16 +331,19 @@ class LevelSelectScreen extends ConsumerWidget {
                             const SizedBox(height: 3),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                3,
-                                (s) => Icon(
+                              children: List.generate(3, (index) {
+                                final isEarned = index < earnedStars;
+                                final color = isCurrent
+                                    ? AppColors.white
+                                    : (isEarned
+                                          ? AppColors.accentGold
+                                          : AppColors.starEmpty);
+                                return Icon(
                                   Icons.star_rounded,
                                   size: 11,
-                                  color: isCurrent
-                                      ? AppColors.white
-                                      : AppColors.accentGold,
-                                ),
-                              ),
+                                  color: color,
+                                );
+                              }),
                             ),
                           ] else ...[
                             Icon(
@@ -338,7 +353,7 @@ class LevelSelectScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '$levelNumber',
+                              localizedNumber(context, levelNumber),
                               style: TextStyle(
                                 color: AppColors.withAlpha(
                                   AppColors.white,

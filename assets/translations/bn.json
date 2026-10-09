@@ -5,7 +5,7 @@
     "play": "খেলুন (লেভেল {level})",
     "select_level": "লেভেল নির্বাচন",
     "settings": "সেটিংস",
-    "unlocked": "আনলকড: {count} / 30,000"
+    "unlocked": "আনলকড: {count} / {total}"
   },
   "settings": {
     "title": "সেটিংস",
@@ -25,7 +25,7 @@
     "confirm_reset": "রিসেট",
     "reset_done": "সব প্রোগ্রেস এবং সেটিংস রিসেট হয়েছে।",
     "auth_failed": "অথেন্টিকেশন ব্যর্থ হয়েছে।",
-    "version": "উডএস্কেপ v1.0.0",
+    "version": "উডএস্কেপ v{version}",
     "language": "ভাষা"
   },
   "game": {
@@ -44,7 +44,7 @@
   "level_select": {
     "title": "লেভেল নির্বাচন",
     "campaign": "ক্যাম্পেইন প্রোগ্রেস",
-    "unlocked_count": "লেভেল {level} / 30,000 আনলকড",
+    "unlocked_count": "লেভেল {level} / {total} আনলকড",
     "locked_msg": "লেভেল {level} লকড! আগের লেভেল শেষ করুন।",
     "easy": "সহজ",
     "medium": "মাঝারি",

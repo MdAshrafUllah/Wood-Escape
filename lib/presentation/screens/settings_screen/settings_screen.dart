@@ -7,6 +7,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/core/utils/app_dialog.dart';
 import 'package:woodescape/core/utils/app_snackbar.dart';
+import 'package:woodescape/core/utils/localized_number.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/audio_service.dart';
@@ -183,7 +184,12 @@ class SettingsScreen extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.only(bottom: 16.0),
               child: Text(
-                'settings.version'.tr(),
+                'settings.version'.tr(
+                  namedArgs: {
+                    'version':
+                        '${localizedNumber(context, 1.0)}.${localizedNumber(context, 0)}.${localizedNumber(context, 0)}',
+                  },
+                ),
                 style: TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 12,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/core/utils/app_dialog.dart';
+import 'package:woodescape/core/utils/localized_number.dart';
 import 'package:woodescape/domain/engine/game_board.dart';
 import 'package:woodescape/domain/engine/puzzle_solver.dart';
 import 'package:woodescape/domain/models/block.dart';
@@ -143,7 +144,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'game.passed'.tr(namedArgs: {'level': '$level'}),
+                  'game.passed'.tr(
+                    namedArgs: {'level': localizedNumber(context, level)},
+                  ),
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -153,7 +156,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'game.completed_in'.tr(namedArgs: {'moves': '$moves'}),
+                  'game.completed_in'.tr(
+                    namedArgs: {'moves': localizedNumber(context, moves)},
+                  ),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -162,7 +167,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'game.best_possible'.tr(namedArgs: {'moves': '$minMoves'}),
+                  'game.best_possible'.tr(
+                    namedArgs: {'moves': localizedNumber(context, minMoves)},
+                  ),
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.withAlpha(AppColors.splashTitleColor, 0.6),
@@ -394,7 +401,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   children: [
                     Text(
                       'game.level'.tr(
-                        namedArgs: {'level': '${gameState.currentLevel}'},
+                        namedArgs: {
+                          'level': localizedNumber(
+                            context,
+                            gameState.currentLevel,
+                          ),
+                        },
                       ),
                       style: const TextStyle(
                         color: AppColors.splashTitleColor,
@@ -434,7 +446,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
                     const SizedBox(width: 6),
                     Text(
                       'game.moves'.tr(
-                        namedArgs: {'count': '${gameState.moveCount}'},
+                        namedArgs: {
+                          'count': localizedNumber(
+                            context,
+                            gameState.moveCount,
+                          ),
+                        },
                       ),
                       style: const TextStyle(
                         color: AppColors.accentGold,

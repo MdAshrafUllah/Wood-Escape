@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+.agents
+.vscode/mcp.json
+skills-lock.json

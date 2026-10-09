@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/constants/app_audio.dart';
 import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
+import 'package:woodescape/core/utils/localized_number.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/audio_service.dart';
 
@@ -277,7 +278,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _buildWoodenButton(
           context: context,
           label: 'home.play'.tr(
-            namedArgs: {'level': '${gameState.currentLevel}'},
+            namedArgs: {
+              'level': localizedNumber(context, gameState.currentLevel),
+            },
           ),
           icon: Icons.play_arrow_rounded,
           isPrimary: true,
@@ -311,7 +314,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(width: 6),
         Text(
           'home.unlocked'.tr(
-            namedArgs: {'count': '${gameState.unlockedLevel}'},
+            namedArgs: {
+              'count': localizedNumber(context, gameState.unlockedLevel),
+              'total': localizedNumber(context, 30000),
+            },
           ),
           style: const TextStyle(
             color: AppColors.textSecondary,

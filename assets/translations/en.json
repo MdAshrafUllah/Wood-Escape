@@ -5,7 +5,7 @@
     "play": "PLAY (LEVEL {level})",
     "select_level": "SELECT LEVEL",
     "settings": "SETTINGS",
-    "unlocked": "Unlocked: {count} / 30,000"
+    "unlocked": "Unlocked: {count} / {total}"
   },
   "settings": {
     "title": "SETTINGS",
@@ -25,8 +25,7 @@
     "confirm_reset": "RESET",
     "reset_done": "All progress and settings have been reset.",
     "auth_failed": "Authentication failed or cancelled.",
-    "version": "WoodEscape v1.0.0",
-    "language": "Language"
+    "version": "WoodEscape v{version}"
   },
   "game": {
     "level": "LEVEL {level}",
@@ -44,7 +43,7 @@
   "level_select": {
     "title": "SELECT LEVEL",
     "campaign": "CAMPAIGN PROGRESS",
-    "unlocked_count": "Level {level} / 30,000 Unlocked",
+    "unlocked_count": "Level {level} / {total} Unlocked",
     "locked_msg": "Level {level} is locked! Complete previous levels first.",
     "easy": "EASY",
     "medium": "MEDIUM",
