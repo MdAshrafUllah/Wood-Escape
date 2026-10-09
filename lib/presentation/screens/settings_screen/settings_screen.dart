@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/core/utils/app_dialog.dart';
+import 'package:woodescape/core/utils/app_links.dart';
 import 'package:woodescape/core/utils/app_snackbar.dart';
-import 'package:woodescape/core/utils/localized_number.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
 import 'package:woodescape/services/audio_service.dart';
@@ -169,6 +169,38 @@ class SettingsScreen extends ConsumerWidget {
                       }
                     },
                   ),
+                  const SizedBox(height: 12),
+                  _buildActionTile(
+                    title: 'settings.rate_us'.tr(),
+                    subtitle: 'settings.rate_us_sub'.tr(),
+                    icon: Icons.star_outline_rounded,
+                    iconColor: AppColors.accentGold,
+                    onTap: () => AppLinks.rateApp(),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActionTile(
+                    title: 'settings.share_app'.tr(),
+                    subtitle: 'settings.share_app_sub'.tr(),
+                    icon: Icons.share_rounded,
+                    iconColor: AppColors.accentGold,
+                    onTap: () => AppLinks.shareApp(),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActionTile(
+                    title: 'settings.privacy_policy'.tr(),
+                    subtitle: 'settings.privacy_policy_sub'.tr(),
+                    icon: Icons.privacy_tip_outlined,
+                    iconColor: AppColors.accentGold,
+                    onTap: () => AppLinks.openPrivacyPolicy(),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActionTile(
+                    title: 'settings.terms'.tr(),
+                    subtitle: 'settings.terms_sub'.tr(),
+                    icon: Icons.description_outlined,
+                    iconColor: AppColors.accentGold,
+                    onTap: () => AppLinks.openTerms(),
+                  ),
                   const SizedBox(height: 24),
                   _buildActionTile(
                     title: 'settings.reset'.tr(),
@@ -182,19 +214,33 @@ class SettingsScreen extends ConsumerWidget {
             ),
 
             Padding(
-              padding: EdgeInsets.only(bottom: 16.0),
-              child: Text(
-                'settings.version'.tr(
-                  namedArgs: {
-                    'version':
-                        '${localizedNumber(context, 1.0)}.${localizedNumber(context, 0)}.${localizedNumber(context, 0)}',
-                  },
-                ),
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+              padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'settings.version_label'.tr(),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  FutureBuilder<String>(
+                    future: AppLinks.getAppVersion(),
+                    builder: (context, snapshot) {
+                      final version = snapshot.data ?? '...';
+                      return Text(
+                        'v$version',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ],

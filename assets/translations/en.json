@@ -25,7 +25,16 @@
     "confirm_reset": "RESET",
     "reset_done": "All progress and settings have been reset.",
     "auth_failed": "Authentication failed or cancelled.",
-    "version": "WoodEscape v{version}"
+    "rate_us": "Rate Us",
+    "rate_us_sub": "Enjoying the game? Leave a review!",
+    "share_app": "Share App",
+    "share_app_sub": "Tell your friends about WoodEscape",
+    "privacy_policy": "Privacy Policy",
+    "privacy_policy_sub": "How we handle your data",
+    "terms": "Terms & Conditions",
+    "terms_sub": "Rules for using WoodEscape",
+    "version_label": "Version",
+    "language": "Language"
   },
   "game": {
     "level": "LEVEL {level}",

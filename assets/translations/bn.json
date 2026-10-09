@@ -25,7 +25,15 @@
     "confirm_reset": "রিসেট",
     "reset_done": "সব প্রোগ্রেস এবং সেটিংস রিসেট হয়েছে।",
     "auth_failed": "অথেন্টিকেশন ব্যর্থ হয়েছে।",
-    "version": "উডএস্কেপ v{version}",
+    "rate_us": "রেটিং দিন",
+    "rate_us_sub": "গেমটি ভালো লাগলে রিভিউ দিন!",
+    "share_app": "শেয়ার করুন",
+    "share_app_sub": "বন্ধুদের WoodEscape সম্পর্কে জানান",
+    "privacy_policy": "প্রাইভেসি পলিসি",
+    "privacy_policy_sub": "আমরা কীভাবে আপনার ডেটা হ্যান্ডেল করি",
+    "terms": "শর্তাবলী",
+    "terms_sub": "WoodEscape ব্যবহারের নিয়ম",
+    "version_label": "সংস্করণ",
     "language": "ভাষা"
   },
   "game": {

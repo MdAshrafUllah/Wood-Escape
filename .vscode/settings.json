@@ -1,5 +1,6 @@
 {
-    "cSpell.words": [
-        "woodescape"
-    ]
+  "cSpell.words": [
+    "woodescape"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.41.7"
 }
