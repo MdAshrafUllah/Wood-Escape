@@ -1,5 +1,5 @@
 {
-  "app_title": "WoodEscape",
+  "app_title": "Wood Escape",
   "home": {
     "subtitle": "Unblock The Red Block",
     "play": "PLAY (LEVEL {level})",
@@ -62,6 +62,6 @@
     "master": "MASTER"
   },
   "splash": {
-    "subtitle": "UNBLOCK THE WAY"
+    "subtitle": "UNBLOCK THE RED BLOCK"
   }
 }

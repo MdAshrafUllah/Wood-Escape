@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
+import 'package:woodescape/presentation/widgets/app_logo.dart';
 
 import '../../../core/router/routers.dart';
 
@@ -40,9 +41,14 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        context.go(AppRoutes.home);
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          context.go(AppRoutes.home);
+        } catch (e) {
+          debugPrint('Splash navigation error: $e');
+        }
+      });
     });
   }
 
@@ -78,35 +84,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // 3D Wooden Icon Frame
-                    Container(
-                      width: 110,
-                      height: 110,
-                      decoration: BoxDecoration(
-                        gradient: AppColors.standardBlockGradient,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: AppColors.accentLightPeach.withValues(
-                            alpha: 0.8,
-                          ),
-                          width: 2.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.black.withValues(alpha: 0.6),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.grid_view_rounded,
-                          size: 56,
-                          color: AppColors.splashIconColor,
-                        ),
-                      ),
-                    ),
+                    BuildLogo(size: 110),
                     const SizedBox(height: 28),
 
                     // Game Title

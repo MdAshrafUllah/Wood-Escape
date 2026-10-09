@@ -89,6 +89,9 @@ class SettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   _buildToggleTile(
+                    iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     title: 'settings.sound'.tr(),
                     subtitle: 'settings.sound_sub'.tr(),
                     icon: Icons.volume_up_rounded,
@@ -111,10 +114,15 @@ class SettingsScreen extends ConsumerWidget {
                         : 'English',
                     icon: Icons.language_rounded,
                     iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     onTap: () => _showLanguagePicker(context),
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
+                    iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     title: 'settings.music'.tr(),
                     subtitle: 'settings.music_sub'.tr(),
                     icon: Icons.music_note_rounded,
@@ -131,6 +139,9 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   _buildToggleTile(
+                    iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     title: 'settings.haptics'.tr(),
                     subtitle: 'settings.haptics_sub'.tr(),
                     icon: Icons.touch_app_rounded,
@@ -153,6 +164,9 @@ class SettingsScreen extends ConsumerWidget {
                   _buildToggleTile(
                     title: 'settings.vibration'.tr(),
                     subtitle: 'settings.vibration_sub'.tr(),
+                    iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     icon: Icons.vibration_rounded,
                     value: settings.vibration,
                     onChanged: (val) async {
@@ -175,6 +189,8 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'settings.rate_us_sub'.tr(),
                     icon: Icons.star_outline_rounded,
                     iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     onTap: () => AppLinks.rateApp(),
                   ),
                   const SizedBox(height: 12),
@@ -183,6 +199,8 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'settings.share_app_sub'.tr(),
                     icon: Icons.share_rounded,
                     iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     onTap: () => AppLinks.shareApp(),
                   ),
                   const SizedBox(height: 12),
@@ -191,6 +209,8 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'settings.privacy_policy_sub'.tr(),
                     icon: Icons.privacy_tip_outlined,
                     iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     onTap: () => AppLinks.openPrivacyPolicy(),
                   ),
                   const SizedBox(height: 12),
@@ -199,6 +219,8 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'settings.terms_sub'.tr(),
                     icon: Icons.description_outlined,
                     iconColor: AppColors.accentGold,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     onTap: () => AppLinks.openTerms(),
                   ),
                   const SizedBox(height: 24),
@@ -207,38 +229,40 @@ class SettingsScreen extends ConsumerWidget {
                     subtitle: 'settings.reset_sub'.tr(),
                     icon: Icons.restore_rounded,
                     iconColor: AppColors.accentRed,
+                    titleColor: AppColors.accentRed,
+                    subtitleColor: AppColors.accentRed,
                     onTap: () => _showResetConfirmationDialog(context, ref),
                   ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'settings.version_label'.tr(),
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 11,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  FutureBuilder<String>(
-                    future: AppLinks.getAppVersion(),
-                    builder: (context, snapshot) {
-                      final version = snapshot.data ?? '...';
-                      return Text(
-                        'v$version',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'settings.version_label'.tr(),
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                          ),
                         ),
-                      );
-                    },
+                        const SizedBox(width: 4),
+                        FutureBuilder<String>(
+                          future: AppLinks.getAppVersion(),
+                          builder: (context, snapshot) {
+                            final version = snapshot.data ?? '...';
+                            return Text(
+                              'v$version',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -255,15 +279,66 @@ class SettingsScreen extends ConsumerWidget {
     required IconData icon,
     required bool value,
     required ValueChanged<bool> onChanged,
+    required Color iconColor,
+    required Color titleColor,
+    required Color subtitleColor,
   }) {
-    return Container(
+    return _buildBaseTile(
+      title: title,
+      subtitle: subtitle,
+      icon: icon,
+      iconColor: iconColor,
+      titleColor: titleColor,
+      subtitleColor: subtitleColor,
+      trailing: Switch(
+        value: value,
+        onChanged: onChanged,
+        activeThumbColor: AppColors.accentGold,
+        activeTrackColor: AppColors.accentDarkBrown,
+        inactiveThumbColor: AppColors.textSecondary,
+        inactiveTrackColor: AppColors.accentVeryDarkBrown,
+      ),
+      onTap: null,
+    );
+  }
+
+  Widget _buildActionTile({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    required Color titleColor,
+    required Color subtitleColor,
+    required VoidCallback onTap,
+  }) {
+    return _buildBaseTile(
+      title: title,
+      subtitle: subtitle,
+      icon: icon,
+      iconColor: iconColor,
+      titleColor: titleColor,
+      subtitleColor: subtitleColor,
+      trailing: Icon(Icons.chevron_right_rounded, color: iconColor),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildBaseTile({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Widget trailing,
+    required VoidCallback? onTap,
+    required Color iconColor,
+    required Color titleColor,
+    required Color subtitleColor,
+  }) {
+    final tile = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.cardSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.withAlpha(AppColors.accentLightBrown, 0.2),
-        ),
+        border: Border.all(color: AppColors.withAlpha(iconColor, 0.2)),
       ),
       child: Row(
         children: [
@@ -273,7 +348,7 @@ class SettingsScreen extends ConsumerWidget {
               color: AppColors.accentVeryDarkBrown,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: AppColors.accentGold, size: 22),
+            child: Icon(icon, color: iconColor, size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -282,8 +357,8 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: titleColor,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
@@ -291,86 +366,24 @@ class SettingsScreen extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: subtitleColor, fontSize: 12),
                 ),
               ],
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: AppColors.accentGold,
-            activeTrackColor: AppColors.accentDarkBrown,
-            inactiveThumbColor: AppColors.textSecondary,
-            inactiveTrackColor: AppColors.accentVeryDarkBrown,
-          ),
+          trailing,
         ],
       ),
     );
-  }
 
-  Widget _buildActionTile({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color iconColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.cardSurface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.withAlpha(iconColor, 0.3)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.withAlpha(iconColor, 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: iconColor, size: 22),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: iconColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
-            ),
-          ],
-        ),
-      ),
-    );
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: tile,
+      );
+    }
+    return tile;
   }
 
   Future<void> _handleResetProcess(BuildContext context, WidgetRef ref) async {

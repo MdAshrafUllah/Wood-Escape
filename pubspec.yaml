@@ -36,11 +36,53 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.15.1
   json_serializable: ^6.14.1
+  flutter_native_splash: ^2.4.8
+  flutter_launcher_icons: ^0.14.4
+
+dependency_overrides:
+  meta: ^1.18.0
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/audio/move.mp3
-    - assets/audio/win.mp3
-    - assets/audio/bg_music.mp3
+    - assets/audios/
     - assets/translations/
+    - assets/images/
+
+flutter_native_splash:
+  color: "#1E0E07"
+  color_dark: "#1E0E07"
+  image: assets/images/wood_escape_logo.png
+  fullscreen: true
+
+  android: true
+  android_gravity: center
+
+  android_12:
+    color: "#100500"
+    icon_background_color: "#100500"
+    image: assets/images/wood_escape_logo_12.png
+    icon_background_color_dark: "#100500"
+
+  ios: true
+  ios_content_mode: center
+
+  web: true
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/images/wood_escape_logo.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/images/wood_escape_logo.png"
+    background_color: "#100500"
+    theme_color: "#100500"
+  windows:
+    generate: true
+    image_path: "assets/images/wood_escape_logo.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/wood_escape_logo.png"

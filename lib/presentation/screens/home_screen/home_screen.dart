@@ -7,6 +7,7 @@ import 'package:woodescape/core/router/routers.dart';
 import 'package:woodescape/core/theme/app_colors.dart';
 import 'package:woodescape/core/utils/localized_number.dart';
 import 'package:woodescape/presentation/controllers/game_controller.dart';
+import 'package:woodescape/presentation/widgets/app_logo.dart';
 import 'package:woodescape/services/audio_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -89,7 +90,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        _buildLogo(size: 80, iconSize: 40),
+                                        BuildLogo(),
                                         const SizedBox(height: 12),
                                         _buildTitleText(
                                           subtitleSize: 16,
@@ -145,7 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 const SizedBox(height: 10),
                                 Column(
                                   children: [
-                                    _buildLogo(size: 110, iconSize: 56),
+                                    BuildLogo(),
                                     const SizedBox(height: 24),
                                     _buildTitleText(
                                       subtitleSize: 22,
@@ -179,35 +180,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildLogo({required double size, required double iconSize}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        gradient: AppColors.standardBlockGradient,
-        borderRadius: BorderRadius.circular(size * 0.22),
-        border: Border.all(
-          color: AppColors.accentLightPeach.withValues(alpha: 0.8),
-          width: 2.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.6),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Icon(
-          Icons.grid_view_rounded,
-          size: iconSize,
-          color: AppColors.splashIconColor,
-        ),
-      ),
-    );
-  }
-
   Widget _buildTitleText({
     required double subtitleSize,
     required double mainTitleSize,
@@ -215,11 +187,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Column(
       children: [
         Text(
-          'WOODEN'.toUpperCase(),
+          'WOOD'.toUpperCase(),
           style: TextStyle(
-            fontSize: subtitleSize,
+            fontSize: mainTitleSize,
             fontWeight: FontWeight.w800,
-            letterSpacing: 8,
+            letterSpacing: 4,
             color: AppColors.textSecondary,
             shadows: [
               Shadow(
@@ -233,9 +205,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Text(
           'ESCAPE'.toUpperCase(),
           style: TextStyle(
-            fontSize: mainTitleSize,
+            fontSize: subtitleSize,
             fontWeight: FontWeight.w800,
-            letterSpacing: 4,
+            letterSpacing: 8,
             color: AppColors.textPrimary,
             shadows: [
               Shadow(
