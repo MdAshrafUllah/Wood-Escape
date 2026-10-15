@@ -1,5 +1,8 @@
+import 'dart:async';
+import 'dart:isolate';
 import 'dart:math';
 
+// import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:woodescape/domain/engine/game_board.dart';
 import 'package:woodescape/domain/engine/puzzle_solver.dart';
 import 'package:woodescape/domain/models/block.dart';
@@ -12,17 +15,25 @@ class GeneratedLevel {
   const GeneratedLevel(this.blocks, this.minMoves, this.exitSide);
 }
 
+GeneratedLevel _generateInIsolate(int level) {
+  return LevelGenerator._generateInternal(level);
+}
+
 class LevelGenerator {
   static final Map<int, GeneratedLevel> _cache = {};
   static final Set<String> _generatedSignatures = {};
+  static final Future<void> _prefetchChain = Future.value();
 
-  static GeneratedLevel generate(int level) {
+  static GeneratedLevel generate(int level) => _generateInternal(level);
+
+  static GeneratedLevel _generateInternal(int level) {
     if (level == 1) return _returnFallback();
     if (_cache.containsKey(level)) return _cache[level]!;
 
     final baseSeed = level * 999999937;
     final difficulty = getDifficultyForLevel(level);
 
+    // int maxAttempts = kIsWeb ? 500 : 2000;
     int maxAttempts = 2000;
     for (int i = 0; i < maxAttempts; i++) {
       final rng = Random(baseSeed + (i * 12345));
@@ -45,6 +56,26 @@ class LevelGenerator {
     }
 
     return _returnFallback();
+  }
+
+  static Future<GeneratedLevel> generateAsync(int level) async {
+    if (level == 1) return _returnFallback();
+    if (_cache.containsKey(level)) return _cache[level]!;
+
+    // if (kIsWeb) {
+    //   // Give the UI a chance to render the loading frame first.
+    //   await Future<void>.delayed(const Duration(milliseconds: 100));
+    //   return generate(level);
+    // }
+
+    try {
+      final result = await Isolate.run(() => _generateInIsolate(level));
+      _cache[level] = result;
+      _generatedSignatures.add(_getSignature(result.blocks, result.exitSide));
+      return result;
+    } catch (_) {
+      return generate(level);
+    }
   }
 
   static ExitSide _pickExitSide(int level) => ExitSide.values[level % 4];
@@ -102,6 +133,24 @@ class LevelGenerator {
   static void clearCacheForTest() {
     _cache.clear();
     _generatedSignatures.clear();
+  }
+
+  static Future<void> prefetch(int level) async {
+    if (level < 1) return;
+    if (_cache.containsKey(level)) return;
+    // if (kIsWeb) {
+    //   await Future<void>.delayed(Duration.zero);
+    //   if (_cache.containsKey(level)) return;
+    //   generate(level);
+    //   return;
+    // }
+    try {
+      final result = await Isolate.run(() => _generateInIsolate(level));
+      if (!_cache.containsKey(level)) {
+        _cache[level] = result;
+        _generatedSignatures.add(_getSignature(result.blocks, result.exitSide));
+      }
+    } catch (_) {}
   }
 
   static int _getMinMoveThreshold(LevelDifficulty diff) {

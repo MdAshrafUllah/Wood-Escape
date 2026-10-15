@@ -47,7 +47,8 @@
     "completed_in": "Completed in {moves} moves!",
     "best_possible": "Best possible: {moves} moves",
     "play_again": "PLAY AGAIN",
-    "next_level": "NEXT LEVEL"
+    "next_level": "NEXT LEVEL",
+    "loading": "Loading level..."
   },
   "level_select": {
     "title": "SELECT LEVEL",

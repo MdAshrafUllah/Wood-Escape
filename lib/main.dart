@@ -29,6 +29,12 @@ void main() async {
     vibration: progress.settings.vibration,
   );
 
+  final debugContainer = ProviderContainer(
+    overrides: [storageServiceProvider.overrideWithValue(storage)],
+  );
+  await debugContainer.read(progressProvider.notifier).debugUnlockAll();
+  debugContainer.dispose();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('bn')],

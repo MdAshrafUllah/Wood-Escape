@@ -1,0 +1,63 @@
+name: Generate WoodEscape Levels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        range:
+          - [20481, 20800]
+          - [20801, 21100]
+          - [21101, 21400]
+          - [21401, 21700]
+          - [21701, 22000]
+          - [22001, 22300]
+          - [22301, 22600]
+          - [22601, 22900]
+          - [22901, 23200]
+          - [23201, 23500]
+          - [23501, 23800]
+          - [23801, 24100]
+          - [24101, 24400]
+          - [24401, 24700]
+          - [24701, 25000]
+          - [25001, 25300]
+          - [25301, 25600]
+          - [25601, 25900]
+          - [25901, 26200]
+          - [26201, 26500]
+          - [26501, 26800]
+          - [26801, 27100]
+          - [27101, 27400]
+          - [27401, 27700]
+          - [27701, 28000]
+          - [28001, 28300]
+          - [28301, 28600]
+          - [28601, 28900]
+          - [28901, 29200]
+          - [29201, 29500]
+          - [29501, 29800]
+          - [29801, 30000]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: |
+          dart run tool/generate_levels_ci.dart \
+            --start ${{ matrix.range[0] }} \
+            --end ${{ matrix.range[1] }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: levels-${{ matrix.range[0] }}-${{ matrix.range[1] }}
+          path: assets/levels/
+          retention-days: 30
+          if-no-files-found: error

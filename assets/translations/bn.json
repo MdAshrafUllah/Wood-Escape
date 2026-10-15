@@ -47,7 +47,8 @@
     "completed_in": "{moves} মুভে সম্পন্ন!",
     "best_possible": "সর্বোত্তম: {moves} মুভ",
     "play_again": "আবার খেলুন",
-    "next_level": "পরবর্তী লেভেল"
+    "next_level": "পরবর্তী লেভেল",
+    "loading": "লেভেল লোড হচ্ছে..."
   },
   "level_select": {
     "title": "লেভেল নির্বাচন",

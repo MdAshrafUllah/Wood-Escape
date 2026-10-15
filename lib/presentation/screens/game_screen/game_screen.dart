@@ -22,7 +22,8 @@ class GameScreen extends ConsumerStatefulWidget {
 class _GameScreenState extends ConsumerState<GameScreen>
     with SingleTickerProviderStateMixin {
   double dragAccumulator = 0.0;
-  bool isDialogShown = false;
+  int? _dialogShownForLevel;
+  bool _isDialogOpen = false;
 
   // Hint Animation variables
   String? highlightedBlockId;
@@ -98,9 +99,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
     int moves,
     int minMoves,
   ) {
-    if (isDialogShown) return;
-    isDialogShown = true;
-
     final stars = calculateStars(moves, minMoves);
 
     showDialog(
@@ -117,7 +115,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               border: Border.all(color: AppColors.accentGold, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.8),
+                  color: AppColors.black.withAlpha(204),
                   blurRadius: 25,
                   offset: const Offset(0, 10),
                 ),
@@ -190,10 +188,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        onPressed: () {
-                          isDialogShown = false;
-                          Navigator.of(context).pop();
-                          ref.read(gameProvider.notifier).resetLevel();
+                        onPressed: () async {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          _isDialogOpen = false;
+                          _dialogShownForLevel = null;
+                          await ref.read(gameProvider.notifier).resetLevel();
                         },
                         child: Text(
                           'game.play_again'.tr(),
@@ -215,10 +214,11 @@ class _GameScreenState extends ConsumerState<GameScreen>
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        onPressed: () {
-                          isDialogShown = false;
-                          Navigator.of(context).pop();
-                          ref.read(gameProvider.notifier).nextLevel();
+                        onPressed: () async {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          _isDialogOpen = false;
+                          _dialogShownForLevel = null;
+                          await ref.read(gameProvider.notifier).nextLevel();
                         },
                         child: Text(
                           'game.next_level'.tr(),
@@ -245,7 +245,12 @@ class _GameScreenState extends ConsumerState<GameScreen>
     final board = gameState.board;
 
     ref.listen<GameState>(gameProvider, (previous, next) {
-      if (next.isCompleted && !(previous?.isCompleted ?? false)) {
+      if (next.isCompleted &&
+          !(previous?.isCompleted ?? false) &&
+          _dialogShownForLevel != next.currentLevel &&
+          !_isDialogOpen) {
+        _dialogShownForLevel = next.currentLevel;
+        _isDialogOpen = true;
         _showCompletionDialog(
           context,
           ref,
@@ -259,66 +264,70 @@ class _GameScreenState extends ConsumerState<GameScreen>
     return Scaffold(
       backgroundColor: AppColors.primaryBackground,
       body: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            final isLandscape = orientation == Orientation.landscape;
+        child: gameState.isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.accentGold),
+              )
+            : OrientationBuilder(
+                builder: (context, orientation) {
+                  final isLandscape = orientation == Orientation.landscape;
 
-            if (isLandscape) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  children: [
-                    // Left Side: Header Info & Hint Controls
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  if (isLandscape) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
                         children: [
-                          _buildHeaderCard(gameState, board),
-                          const SizedBox(height: 12),
-                          _buildInstructionBadge(),
+                          // Left Side: Header Info & Hint Controls
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildHeaderCard(gameState, board),
+                                const SizedBox(height: 12),
+                                _buildInstructionBadge(),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+
+                          // Right Side: Maximized Responsive Board
+                          Expanded(
+                            flex: 5,
+                            child: Center(
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: _buildGameBoard(board),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 16),
+                    );
+                  }
 
-                    // Right Side: Maximized Responsive Board
-                    Expanded(
-                      flex: 5,
-                      child: Center(
+                  // Portrait Mode Layout
+                  return Column(
+                    children: [
+                      _buildHeaderCard(gameState, board),
+                      const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: AspectRatio(
                           aspectRatio: 1,
                           child: _buildGameBoard(board),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            // Portrait Mode Layout
-            return Column(
-              children: [
-                _buildHeaderCard(gameState, board),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: _buildGameBoard(board),
-                  ),
-                ),
-                const Spacer(),
-                _buildInstructionBadge(),
-                const SizedBox(height: 12),
-              ],
-            );
-          },
-        ),
+                      const Spacer(),
+                      _buildInstructionBadge(),
+                      const SizedBox(height: 12),
+                    ],
+                  );
+                },
+              ),
       ),
     );
   }
@@ -474,7 +483,6 @@ class _GameScreenState extends ConsumerState<GameScreen>
               size: 22,
             ),
             onPressed: () {
-              isDialogShown = false;
               ref.read(gameProvider.notifier).resetLevel();
             },
           ),
@@ -938,7 +946,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.black.withValues(alpha: 0.5),
+                          color: AppColors.black.withAlpha(128),
                           blurRadius: 6,
                         ),
                       ],

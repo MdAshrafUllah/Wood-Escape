@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:woodescape/core/constants/app_audio.dart';
 import 'package:woodescape/data/local/user_progress_notifier.dart';
@@ -16,6 +18,7 @@ class GameState {
   final int minMoves;
   final bool isCompleted;
   final bool canUndo;
+  final bool isLoading;
   final ExitSide exitSide;
   final LevelDifficulty difficulty;
 
@@ -29,6 +32,7 @@ class GameState {
     this.minMoves = 10,
     this.isCompleted = false,
     this.canUndo = false,
+    this.isLoading = false,
   });
 
   GameState copyWith({
@@ -41,6 +45,7 @@ class GameState {
     int? minMoves,
     bool? isCompleted,
     bool? canUndo,
+    bool? isLoading,
   }) {
     return GameState(
       currentLevel: currentLevel ?? this.currentLevel,
@@ -52,6 +57,7 @@ class GameState {
       minMoves: minMoves ?? this.minMoves,
       isCompleted: isCompleted ?? this.isCompleted,
       canUndo: canUndo ?? this.canUndo,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 
@@ -82,30 +88,36 @@ class GameNotifier extends Notifier<GameState> {
     final level = savedProgress.currentLevel;
 
     _history.clear();
-    final generated = LevelGenerator.generate(level);
-
     return GameState(
       currentLevel: level,
       unlockedLevel: savedProgress.unlockedLevel,
-      board: GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
+      board: GameBoard(blocks: const [], exitSide: ExitSide.right),
       difficulty: getDifficultyForLevel(level),
-      exitSide: generated.exitSide,
+      exitSide: ExitSide.right,
       moveCount: 0,
-      minMoves: generated.minMoves,
+      minMoves: 10,
       isCompleted: false,
       canUndo: false,
+      isLoading: false,
     );
   }
 
-  void selectLevel(int level) {
+  Future<void> selectLevel(int level) async {
     final currentUnlocked = ref.read(progressProvider).unlockedLevel;
 
     if (level <= currentUnlocked) {
-      _history.clear();
-      final generated = LevelGenerator.generate(level);
-
       state = state.copyWith(
         currentLevel: level,
+        isLoading: true,
+        board: GameBoard(blocks: const [], exitSide: ExitSide.right),
+        moveCount: 0,
+        isCompleted: false,
+        canUndo: false,
+      );
+      _history.clear();
+      final generated = await LevelGenerator.generateAsync(level);
+
+      state = state.copyWith(
         unlockedLevel: currentUnlocked,
         board: GameBoard(
           blocks: generated.blocks,
@@ -117,10 +129,12 @@ class GameNotifier extends Notifier<GameState> {
         minMoves: generated.minMoves,
         isCompleted: false,
         canUndo: false,
+        isLoading: false,
       );
 
       ref.read(progressProvider.notifier).setCurrentLevel(level);
     }
+    unawaited(LevelGenerator.prefetch(level + 1));
   }
 
   void slideBlock(Block block, int totalDeltaRow, int totalDeltaCol) {
@@ -199,7 +213,7 @@ class GameNotifier extends Notifier<GameState> {
     HapticService().lightImpact();
   }
 
-  void loadNextLevel() {
+  Future<void> loadNextLevel() async {
     final completedLevel = state.currentLevel;
     final nextLevel = completedLevel + 1;
 
@@ -207,11 +221,18 @@ class GameNotifier extends Notifier<GameState> {
         ? nextLevel
         : state.unlockedLevel;
 
-    _history.clear();
-    final generated = LevelGenerator.generate(nextLevel);
-
-    state = GameState(
+    state = state.copyWith(
       currentLevel: nextLevel,
+      isLoading: true,
+      board: GameBoard(blocks: const [], exitSide: ExitSide.right),
+      moveCount: 0,
+      isCompleted: false,
+      canUndo: false,
+    );
+    _history.clear();
+    final generated = await LevelGenerator.generateAsync(nextLevel);
+
+    state = state.copyWith(
       unlockedLevel: updatedUnlocked,
       board: GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
       difficulty: getDifficultyForLevel(nextLevel),
@@ -220,19 +241,28 @@ class GameNotifier extends Notifier<GameState> {
       minMoves: generated.minMoves,
       isCompleted: false,
       canUndo: false,
+      isLoading: false,
     );
 
     ref.read(progressProvider.notifier).setUnlockedLevel(updatedUnlocked);
     ref.read(progressProvider.notifier).setCurrentLevel(nextLevel);
+    unawaited(LevelGenerator.prefetch(nextLevel + 1));
   }
 
-  void nextLevel() {
-    loadNextLevel();
+  Future<void> nextLevel() async {
+    await loadNextLevel();
   }
 
-  void resetLevel() {
+  Future<void> resetLevel() async {
+    state = state.copyWith(
+      isLoading: true,
+      board: GameBoard(blocks: const [], exitSide: ExitSide.right),
+      moveCount: 0,
+      isCompleted: false,
+      canUndo: false,
+    );
     _history.clear();
-    final generated = LevelGenerator.generate(state.currentLevel);
+    final generated = await LevelGenerator.generateAsync(state.currentLevel);
 
     state = state.copyWith(
       board: GameBoard(blocks: generated.blocks, exitSide: generated.exitSide),
@@ -241,7 +271,9 @@ class GameNotifier extends Notifier<GameState> {
       moveCount: 0,
       isCompleted: false,
       canUndo: false,
+      isLoading: false,
     );
+    unawaited(LevelGenerator.prefetch(state.currentLevel + 1));
   }
 }
 

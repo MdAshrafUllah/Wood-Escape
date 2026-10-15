@@ -49,6 +49,21 @@ class UserProgressNotifier extends Notifier<UserProgress> {
     state = const UserProgress();
     await _persist();
   }
+
+  /// DEBUG ONLY — unlock all levels for testing.
+  /// Remove before release.
+  Future<void> debugUnlockAll({int totalLevels = 30000}) async {
+    final updatedStars = Map<int, int>.from(state.stars);
+    for (int i = 1; i <= totalLevels; i++) {
+      updatedStars.putIfAbsent(i, () => 3);
+    }
+    state = state.copyWith(
+      unlockedLevel: totalLevels,
+      currentLevel: 1,
+      stars: updatedStars,
+    );
+    await _persist();
+  }
 }
 
 final progressProvider = NotifierProvider<UserProgressNotifier, UserProgress>(
