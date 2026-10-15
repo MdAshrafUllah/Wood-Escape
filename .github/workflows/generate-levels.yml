@@ -46,16 +46,27 @@ jobs:
           - [29801, 30000]
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          sdk: stable
-      - run: dart pub get
-      - run: |
+          flutter-version: '3.41.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate levels ${{ matrix.range[0] }}-${{ matrix.range[1] }}
+        run: |
           dart run tool/generate_levels_ci.dart \
             --start ${{ matrix.range[0] }} \
             --end ${{ matrix.range[1] }}
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: levels-${{ matrix.range[0] }}-${{ matrix.range[1] }}
           path: assets/levels/
