@@ -9,57 +9,14 @@ jobs:
     timeout-minutes: 350
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: 5
       matrix:
         range:
-          - [25001, 25100]
-          - [25101, 25200]
-          - [25201, 25300]
-          - [25301, 25400]
-          - [25401, 25500]
-          - [25501, 25600]
-          - [25601, 25700]
-          - [25701, 25800]
-          - [25801, 25900]
-          - [25901, 26000]
-          - [26001, 26100]
-          - [26101, 26200]
-          - [26201, 26300]
-          - [26301, 26400]
-          - [26401, 26500]
-          - [26501, 26600]
-          - [26601, 26700]
-          - [26701, 26800]
-          - [26801, 26900]
-          - [26901, 27000]
-          - [27001, 27100]
-          - [27101, 27200]
-          - [27201, 27300]
-          - [27301, 27400]
-          - [27401, 27500]
-          - [27501, 27600]
-          - [27601, 27700]
-          - [27701, 27800]
-          - [27801, 27900]
-          - [27901, 28000]
-          - [28001, 28100]
-          - [28101, 28200]
-          - [28201, 28300]
-          - [28301, 28400]
-          - [28401, 28500]
-          - [28501, 28600]
-          - [28601, 28700]
-          - [28701, 28800]
-          - [28801, 28900]
-          - [28901, 29000]
-          - [29001, 29100]
-          - [29101, 29200]
-          - [29201, 29300]
-          - [29301, 29400]
-          - [29401, 29500]
-          - [29501, 29600]
-          - [29601, 29700]
-          - [29701, 29800]
+          - [0, 1325]
+          - [1326, 2651]
+          - [2652, 3977]
+          - [3978, 5303]
+          - [5304, 6626]
 
     steps:
       - name: Checkout repo
@@ -75,17 +32,16 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Generate levels ${{ matrix.range[0] }}-${{ matrix.range[1] }}
+      - name: Generate specific failed levels
         run: |
-          dart run tool/generate_levels_ci.dart \
-            --start ${{ matrix.range[0] }} \
-            --end ${{ matrix.range[1] }}
+          dart run tool/generate_specific_levels.dart \
+            ${{ matrix.range[0] }} \
+            ${{ matrix.range[1] }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: levels-${{ matrix.range[0] }}-${{ matrix.range[1] }}
+          name: fixed-levels-${{ matrix.range[0] }}-${{ matrix.range[1] }}
           path: assets/levels/
           retention-days: 30
-          if-no-files-found: warn
